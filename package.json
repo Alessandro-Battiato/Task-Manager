@@ -14,6 +14,7 @@
     "@hookform/resolvers": "^5.0.1",
     "@reduxjs/toolkit": "^2.8.1",
     "@tailwindcss/vite": "^4.1.6",
+    "daisyui": "^5.0.35",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-hook-form": "^7.56.3",
