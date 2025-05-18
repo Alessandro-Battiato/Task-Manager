@@ -1,4 +1,6 @@
 import React from "react";
+import Lottie from "lottie-react";
+import emptyState from "../../assets/lottie/emptyState.json";
 
 type Task = { id: string; name: string; status: Status; tags: string[] };
 type Status = "Backlog" | "In Progress" | "In Review" | "Completed";
@@ -40,11 +42,15 @@ const statuses: Status[] = ["Backlog", "In Progress", "In Review", "Completed"];
 
 const Board: React.FC<{ tasks: Task[] }> = ({ selectedId }) => {
     return (
-        <main className="flex-1 bg-base-300 p-4 md:p-6 overflow-auto">
+        <main className="flex-1 p-4 md:p-6 bg-base-200 overflow-auto">
             {!selectedId ? (
-                <div className="h-full flex items-center justify-center text-base-content">
-                    https://lottiefiles.com/animation/empty-document-14482701
-                    Create or Select project
+                <div className="h-full flex flex-col items-center justify-center text-base-content">
+                    <Lottie
+                        className="max-w-sm"
+                        animationData={emptyState}
+                        loop
+                    />
+                    <p>Create or Select a project to start</p>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -57,7 +63,7 @@ const Board: React.FC<{ tasks: Task[] }> = ({ selectedId }) => {
                                     .map((task) => (
                                         <div
                                             key={task.id}
-                                            className="card bg-base-100 shadow"
+                                            className="card shadow bg-base-100"
                                         >
                                             <div className="card-body p-4">
                                                 <h4 className="font-medium text-sm sm:text-base">
