@@ -1,9 +1,8 @@
 import React from "react";
 import Lottie from "lottie-react";
 import emptyState from "../../assets/lottie/emptyState.json";
-
-type Task = { id: string; name: string; status: Status; tags: string[] };
-type Status = "Backlog" | "In Progress" | "In Review" | "Completed";
+import type { BoardProps, Status } from "./types";
+import type { Task } from "../../types/task";
 
 const mockTasks: Task[] = [
     {
@@ -40,7 +39,7 @@ const mockTasks: Task[] = [
 
 const statuses: Status[] = ["Backlog", "In Progress", "In Review", "Completed"];
 
-const Board: React.FC<{ tasks: Task[] }> = ({ selectedId }) => {
+const Board: React.FC<BoardProps> = ({ selectedId }) => {
     return (
         <main className="flex-1 p-4 md:p-6 bg-base-200 overflow-auto">
             {!selectedId ? (

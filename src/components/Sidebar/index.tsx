@@ -1,30 +1,47 @@
-import React, { useState } from "react";
-
-type Project = { id: string; name: string };
+import React, { useCallback, useState } from "react";
+import type { SidebarProps } from "./types";
+import type { Project } from "../../types/project";
 
 const mockProjects: Project[] = [
     { id: "p1", name: "Design Board" },
     { id: "p2", name: "Learning Board" },
 ];
 
-const Sidebar: React.FC<{
-    projects: Project[];
-    selectedId: string | null;
-    onSelect: (id: string) => void;
-}> = ({ selectedId, handleSelectId, toggle }) => {
+const Sidebar: React.FC<SidebarProps> = ({
+    selectedId,
+    handleSelectId,
+    toggle,
+    theme,
+}) => {
     const [isSidebarOpen, setSidebarOpen] = useState(false);
-
     const [projects] = useState<Project[]>(mockProjects);
 
-    const handleProjectSelect = (id: string) => {
-        handleSelectId(id);
-        if (isSidebarOpen) setSidebarOpen(false);
-    };
-    const toggleSidebar = () => setSidebarOpen(!isSidebarOpen);
+    const handleProjectSelect = useCallback(
+        (id: string) => {
+            handleSelectId(id);
+            if (isSidebarOpen) setSidebarOpen(false);
+        },
+        [handleSelectId, isSidebarOpen]
+    );
+
+    const toggleSidebar = useCallback(
+        () => setSidebarOpen(!isSidebarOpen),
+        [isSidebarOpen]
+    );
+
+    // Direct theme set instead of toggle to ensure proper behavior
+    const setTheme = useCallback(
+        (newTheme: string) => {
+            if (newTheme !== theme) {
+                toggle();
+            }
+        },
+        [theme, toggle]
+    );
 
     return (
         <>
-            <header className="md:hidden flex items-center justify-between bg-base-200 p-4">
+            <header className="md:hidden flex items-center justify-between p-4">
                 <button
                     className="btn btn-square btn-ghost"
                     onClick={toggleSidebar}
@@ -45,43 +62,55 @@ const Sidebar: React.FC<{
                     </svg>
                 </button>
                 <h1 className="text-lg font-bold">Tasks Manager</h1>
-                <label className="flex cursor-pointer gap-2">
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                    >
-                        <circle cx="12" cy="12" r="5" />
-                        <path d="M12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4" />
-                    </svg>
+                <label className="toggle text-base-content">
                     <input
-                        onClick={toggle}
                         type="checkbox"
-                        className="toggle theme-controller"
+                        value="synthwave"
+                        className="theme-controller"
+                        onClick={toggle}
                     />
                     <svg
+                        aria-label="sun"
                         xmlns="http://www.w3.org/2000/svg"
-                        width="20"
-                        height="20"
                         viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
                     >
-                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        <g
+                            strokeLinejoin="round"
+                            strokeLinecap="round"
+                            strokeWidth="2"
+                            fill="none"
+                            stroke="currentColor"
+                        >
+                            <circle cx="12" cy="12" r="4"></circle>
+                            <path d="M12 2v2"></path>
+                            <path d="M12 20v2"></path>
+                            <path d="m4.93 4.93 1.41 1.41"></path>
+                            <path d="m17.66 17.66 1.41 1.41"></path>
+                            <path d="M2 12h2"></path>
+                            <path d="M20 12h2"></path>
+                            <path d="m6.34 17.66-1.41 1.41"></path>
+                            <path d="m19.07 4.93-1.41 1.41"></path>
+                        </g>
+                    </svg>
+                    <svg
+                        aria-label="moon"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                    >
+                        <g
+                            strokeLinejoin="round"
+                            strokeLinecap="round"
+                            strokeWidth="2"
+                            fill="none"
+                            stroke="currentColor"
+                        >
+                            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+                        </g>
                     </svg>
                 </label>
             </header>
 
-            <aside className="hidden md:flex w-60 bg-base-200 p-4 flex-col">
+            <aside className="hidden md:flex w-60 p-4 flex-col">
                 <h2 className="text-lg font-bold mb-4">Projects</h2>
                 <ul className="space-y-2 flex-1 overflow-auto">
                     {projects.map((p) => (
@@ -103,7 +132,7 @@ const Sidebar: React.FC<{
                     <div className="tabs tabs-box">
                         <label htmlFor="tab-dark" className="tab gap-2">
                             <svg
-                                className="swap-on h-5 w-5 fill-current"
+                                className="h-5 w-5 fill-current"
                                 xmlns="http://www.w3.org/2000/svg"
                                 viewBox="0 0 24 24"
                             >
@@ -113,13 +142,14 @@ const Sidebar: React.FC<{
                                 type="radio"
                                 id="tab-dark"
                                 name="theme_tabs"
-                                onClick={toggle}
+                                checked={theme === "dark"}
+                                onChange={() => setTheme("dark")}
                             />
                             Dark
                         </label>
                         <label htmlFor="tab-light" className="tab gap-2">
                             <svg
-                                className="swap-off h-5 w-5 fill-current"
+                                className="h-5 w-5 fill-current"
                                 xmlns="http://www.w3.org/2000/svg"
                                 viewBox="0 0 24 24"
                             >
@@ -129,7 +159,8 @@ const Sidebar: React.FC<{
                                 type="radio"
                                 id="tab-light"
                                 name="theme_tabs"
-                                onClick={toggle}
+                                checked={theme === "light"}
+                                onChange={() => setTheme("light")}
                             />
                             Light
                         </label>
@@ -138,7 +169,7 @@ const Sidebar: React.FC<{
             </aside>
 
             {isSidebarOpen && (
-                <div className="fixed inset-0 bg-base-200 bg-opacity-95 z-50 flex flex-col p-4 animate-fade-in">
+                <div className="fixed inset-0 bg-base-200 z-50 flex flex-col p-4">
                     <button
                         className="self-end btn btn-ghost btn-square"
                         onClick={toggleSidebar}

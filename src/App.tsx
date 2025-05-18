@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useTheme } from "./hooks";
 import Sidebar from "./components/Sidebar";
 import Board from "./components/Board";
 
 const App: React.FC = () => {
-    const [selectedId, setSelectedId] = useState<string | null>(null);
-
-    const handleSelectId = (id) => {
-        setSelectedId(id);
-    };
+    const [selectedId, setSelectedId] = useState<string>("");
 
     const { theme, toggle } = useTheme();
+
+    const handleSelectId = useCallback((id: React.SetStateAction<string>) => {
+        setSelectedId(id);
+    }, []);
 
     useEffect(() => {
         document.documentElement.setAttribute("data-theme", theme);
@@ -19,6 +19,7 @@ const App: React.FC = () => {
     return (
         <div className="flex flex-col md:flex-row h-screen">
             <Sidebar
+                theme={theme}
                 toggle={toggle}
                 selectedId={selectedId}
                 handleSelectId={handleSelectId}

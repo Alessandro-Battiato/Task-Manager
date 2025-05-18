@@ -1,10 +1,9 @@
 import React from "react";
-import type { Task } from "./types";
 
-const TaskCard: React.FC<{ task: Task }> = ({ task }) => (
+const TaskCard: React.FC = () => (
     <div className="bg-gray-700 text-gray-100 rounded p-4 space-y-2">
-        <h3 className="font-semibold">{task.name}</h3>
-        <div className="flex flex-wrap gap-1">
+        <h3 className="font-semibold">{/*task.name*/}</h3>
+        {/*<div className="flex flex-wrap gap-1">
             {task.tags.map((tag) => (
                 <span
                     key={tag}
@@ -13,7 +12,7 @@ const TaskCard: React.FC<{ task: Task }> = ({ task }) => (
                     {tag}
                 </span>
             ))}
-        </div>
+        </div>*/}
     </div>
 );
 
