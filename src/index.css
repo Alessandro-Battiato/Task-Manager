@@ -9,4 +9,17 @@
     --color-base-300: #2a2d32;
 
     --color-primary: #3d67db;
+    --color-warning: #f3ce48;
+    --color-info: #b787f3;
+    --color-success: #76da88;
+}
+
+@plugin "daisyui/theme" {
+    name: "light";
+    default: true;
+
+    --color-primary: #3d67db;
+    --color-warning: #f3ce48;
+    --color-info: #b787f3;
+    --color-success: #76da88;
 }
