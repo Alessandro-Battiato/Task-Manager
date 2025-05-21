@@ -41,7 +41,7 @@ const statuses: Status[] = ["Backlog", "In Progress", "In Review", "Completed"];
 
 const Board: React.FC<BoardProps> = ({ selectedId }) => {
     return (
-        <main className="flex-1 p-4 md:p-6 bg-base-200 overflow-auto">
+        <main className="flex-1 m-4 ml-0 p-4 md:p-6 bg-base-200 overflow-auto rounded-lg">
             {!selectedId ? (
                 <div className="h-full flex flex-col items-center justify-center text-base-content">
                     <Lottie

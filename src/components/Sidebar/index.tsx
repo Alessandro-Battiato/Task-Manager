@@ -61,7 +61,6 @@ const Sidebar: React.FC<SidebarProps> = ({
                         />
                     </svg>
                 </button>
-                <h1 className="text-lg font-bold">Tasks Manager</h1>
                 <label className="toggle text-base-content">
                     <input
                         type="checkbox"
@@ -110,7 +109,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 </label>
             </header>
 
-            <aside className="hidden md:flex w-60 p-4 flex-col">
+            <aside className="hidden md:flex w-60 min-w-72 p-4 flex-col">
                 <h2 className="text-lg font-bold mb-4">Projects</h2>
                 <ul className="space-y-2 flex-1 overflow-auto">
                     {projects.map((p) => (
@@ -129,8 +128,11 @@ const Sidebar: React.FC<SidebarProps> = ({
                     ))}
                 </ul>
                 <div className="flex justify-center">
-                    <div className="tabs tabs-box">
-                        <label htmlFor="tab-dark" className="tab gap-2">
+                    <div className="tabs tabs-box w-full rounded-xl">
+                        <label
+                            htmlFor="tab-dark"
+                            className="tab font-semibold gap-2 flex-1 !rounded-lg"
+                        >
                             <svg
                                 className="h-5 w-5 fill-current"
                                 xmlns="http://www.w3.org/2000/svg"
@@ -147,7 +149,10 @@ const Sidebar: React.FC<SidebarProps> = ({
                             />
                             Dark
                         </label>
-                        <label htmlFor="tab-light" className="tab gap-2">
+                        <label
+                            htmlFor="tab-light"
+                            className="tab font-semibold gap-2 flex-1 !rounded-lg"
+                        >
                             <svg
                                 className="h-5 w-5 fill-current"
                                 xmlns="http://www.w3.org/2000/svg"
