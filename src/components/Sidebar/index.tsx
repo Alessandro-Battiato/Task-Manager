@@ -115,10 +115,10 @@ const Sidebar: React.FC<SidebarProps> = ({
                     {projects.map((p) => (
                         <li key={p.id}>
                             <button
-                                className={`btn btn-ghost w-full justify-start ${
+                                className={`btn btn-ghost rounded-3xl border-2 w-full justify-start ${
                                     selectedId === p.id
-                                        ? "bg-primary text-primary-content"
-                                        : ""
+                                        ? "border-primary text-primary-content"
+                                        : "hover:border-base-100 focus:border-base-100"
                                 }`}
                                 onClick={() => handleProjectSelect(p.id)}
                             >
