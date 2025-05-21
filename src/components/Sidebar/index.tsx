@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from "react";
 import type { SidebarProps } from "./types";
 import type { Project } from "../../types/project";
+import ProjectButton from "../ProjectButton";
 
 const mockProjects: Project[] = [
     { id: "p1", name: "Design Board" },
@@ -114,16 +115,11 @@ const Sidebar: React.FC<SidebarProps> = ({
                 <ul className="space-y-2 flex-1 overflow-auto">
                     {projects.map((p) => (
                         <li key={p.id}>
-                            <button
-                                className={`btn btn-ghost rounded-3xl border-2 w-full justify-start ${
-                                    selectedId === p.id
-                                        ? "border-primary text-primary-content"
-                                        : "hover:border-base-100 focus:border-base-100"
-                                }`}
+                            <ProjectButton
                                 onClick={() => handleProjectSelect(p.id)}
-                            >
-                                {p.name}
-                            </button>
+                                isSelected={selectedId === p.id}
+                                cta={p.name}
+                            />
                         </li>
                     ))}
                 </ul>
@@ -185,16 +181,11 @@ const Sidebar: React.FC<SidebarProps> = ({
                     <ul className="space-y-2 flex-1 overflow-auto">
                         {projects.map((p) => (
                             <li key={p.id}>
-                                <button
-                                    className={`btn btn-ghost w-full justify-start ${
-                                        selectedId === p.id
-                                            ? "bg-primary text-primary-content"
-                                            : ""
-                                    }`}
+                                <ProjectButton
                                     onClick={() => handleProjectSelect(p.id)}
-                                >
-                                    {p.name}
-                                </button>
+                                    isSelected={selectedId === p.id}
+                                    cta={p.name}
+                                />
                             </li>
                         ))}
                     </ul>
