@@ -4,6 +4,7 @@ import emptyState from "../../assets/lottie/emptyState.json";
 import type { BoardProps, Status } from "./types";
 import type { Task } from "../../types/task";
 import Badge from "../Badge";
+import TaskCard from "../TaskCard";
 
 const mockTasks: Task[] = [
     {
@@ -47,7 +48,7 @@ const tasksByStatus = statuses.reduce((acc, status) => {
 
 const Board: React.FC<BoardProps> = ({ selectedId }) => {
     return (
-        <main className="flex-1 m-4 md:ml-0 p-4 md:p-6 bg-base-200 overflow-auto rounded-lg">
+        <main className="flex-1 m-4 md:ml-0 p-4 bg-base-200 overflow-auto rounded-2xl">
             {!selectedId ? (
                 <div className="h-full flex flex-col items-center justify-center text-base-content">
                     <Lottie
@@ -58,39 +59,25 @@ const Board: React.FC<BoardProps> = ({ selectedId }) => {
                     <p>Create or select a Project to start</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 h-full">
                     {statuses.map((status) => (
-                        <section key={status} className="space-y-6">
+                        <section
+                            key={status}
+                            className="flex flex-col overflow-hidden gap-6"
+                        >
                             <div className="flex items-center gap-2">
                                 <Badge status={status} />
                                 <h3 className="text-lg font-semibold">
                                     {status} ({tasksByStatus[status].length})
                                 </h3>
                             </div>
-                            <div className="space-y-6">
+                            <div className="flex-1 overflow-y-auto space-y-6 pr-2">
                                 {tasksByStatus[status].map((task) => (
-                                    <div
+                                    <TaskCard
                                         key={task.id}
-                                        className="card shadow bg-base-100"
-                                    >
-                                        {/*To be replaced with Card component*/}
-
-                                        <div className="card-body p-4">
-                                            <h4 className="font-medium text-sm sm:text-base">
-                                                {task.name}
-                                            </h4>
-                                            <div className="flex flex-wrap gap-1 mt-2">
-                                                {task.tags.map((tag) => (
-                                                    <span
-                                                        key={tag}
-                                                        className="badge badge-outline text-xs sm:text-sm"
-                                                    >
-                                                        {tag}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    </div>
+                                        title={task.name}
+                                        tags={task.tags}
+                                    />
                                 ))}
                             </div>
                         </section>

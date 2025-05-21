@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
-import { statusColorMap, type BadgeProps } from "./types";
+import { type BadgeProps } from "./types";
+import { statusColorMap } from "../../types/statusColor";
 
 const Badge: React.FC<BadgeProps> = ({ status }) => {
     const colorClass = useMemo(

@@ -1,18 +1,32 @@
 import React from "react";
+import type { TaskCardProps } from "./types";
 
-const TaskCard: React.FC = () => (
-    <div className="bg-gray-700 text-gray-100 rounded p-4 space-y-2">
-        <h3 className="font-semibold">{/*task.name*/}</h3>
-        {/*<div className="flex flex-wrap gap-1">
-            {task.tags.map((tag) => (
-                <span
-                    key={tag}
-                    className="bg-blue-600 text-xs px-2 py-1 rounded-full"
-                >
-                    {tag}
-                </span>
-            ))}
-        </div>*/}
+const TaskCard: React.FC<TaskCardProps> = ({
+    title,
+    img = "https://cataas.com/cat",
+    tags,
+}) => (
+    <div className="card rounded-2xl shadow bg-base-100">
+        <div className="card-body gap-3 p-4">
+            {!!img && (
+                <img
+                    className="object-cover w-full max-h-32 rounded-2xl"
+                    src={img}
+                    alt="Card image"
+                />
+            )}
+            <h3 className="font-medium text-sm sm:text-lg">{title}</h3>
+            <div className="flex flex-wrap gap-2">
+                {tags.map((tag) => (
+                    <span
+                        key={tag}
+                        className="badge badge-outline text-xs sm:text-sm"
+                    >
+                        {tag}
+                    </span>
+                ))}
+            </div>
+        </div>
     </div>
 );
 
