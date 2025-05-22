@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useTheme } from "./hooks";
 import Sidebar from "./components/Sidebar";
 import Board from "./components/Board";
@@ -11,10 +11,6 @@ const App: React.FC = () => {
     const handleSelectId = useCallback((id: React.SetStateAction<string>) => {
         setSelectedId(id);
     }, []);
-
-    useEffect(() => {
-        document.documentElement.setAttribute("data-theme", theme);
-    }, [theme]);
 
     return (
         <div className="flex flex-col md:flex-row h-screen">
