@@ -5,6 +5,7 @@ import type { BoardProps, Status } from "./types";
 import type { Task } from "../../types/task";
 import Badge from "../Badge";
 import TaskCard from "../TaskCard";
+import { statuses } from "../../data/statuses";
 
 const mockTasks: Task[] = [
     {
@@ -23,7 +24,7 @@ const mockTasks: Task[] = [
         id: "t3",
         name: "Implement edit task",
         status: "In Progress",
-        tags: ["Technical", "Front-end"],
+        tags: ["Technical", "Front-End"],
     },
     {
         id: "t4",
@@ -38,8 +39,6 @@ const mockTasks: Task[] = [
         tags: ["Design"],
     },
 ];
-
-const statuses: Status[] = ["Backlog", "In Progress", "In Review", "Completed"];
 
 const tasksByStatus = statuses.reduce((acc, status) => {
     acc[status] = mockTasks.filter((t) => t.status === status);
@@ -63,7 +62,7 @@ const Board: React.FC<BoardProps> = ({ selectedId }) => {
                     {statuses.map((status) => (
                         <section
                             key={status}
-                            className="flex flex-col overflow-hidden gap-6"
+                            className="flex flex-col overflow-hidden gap-6 min-h-96"
                         >
                             <div className="flex items-center gap-2">
                                 <Badge status={status} />
@@ -77,6 +76,7 @@ const Board: React.FC<BoardProps> = ({ selectedId }) => {
                                         key={task.id}
                                         title={task.name}
                                         tags={task.tags}
+                                        status={status}
                                     />
                                 ))}
                             </div>
