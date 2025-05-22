@@ -6,6 +6,7 @@ import type { BoardProps, Status } from "./types";
 import type { Task } from "../../types/task";
 import { statuses } from "../../data/statuses";
 import Column from "../Column";
+import { useGetTasksQuery } from "../../features/api/asanaApi";
 
 const mockTasks: Task[] = [
     {
@@ -41,6 +42,11 @@ const mockTasks: Task[] = [
 ];
 
 const Board: React.FC<BoardProps> = ({ selectedId }) => {
+    // TO DO: Replace hard coded project id with real ids once requests for projects are implemented
+    const { data, isLoading, error } = useGetTasksQuery(1210218850462885, {
+        skip: !selectedId,
+    });
+    console.log(data);
     const [tasks, setTasks] = useState<Task[]>(mockTasks);
 
     const tasksByStatus = useMemo(
@@ -71,6 +77,9 @@ const Board: React.FC<BoardProps> = ({ selectedId }) => {
             },
         });
     }, []);
+
+    if (isLoading) return <p>Loading...</p>;
+    if (error) return <p>Error</p>;
 
     return (
         <main className="flex-1 m-4 md:ml-0 p-4 bg-base-200 overflow-auto rounded-2xl">

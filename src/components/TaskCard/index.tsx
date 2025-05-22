@@ -34,7 +34,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
     return (
         <div
             ref={ref}
-            className={`card rounded-2xl shadow bg-base-100 cursor-grab transition-transform hover:scale-85 ${
+            className={`card rounded-2xl shadow bg-base-100 cursor-pointer transition-transform hover:scale-85 ${
                 isDragging ? "opacity-50 rotate-2 scale-90" : ""
             }`}
         >
