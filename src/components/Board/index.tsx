@@ -1,11 +1,11 @@
-import React from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import Lottie from "lottie-react";
+import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import emptyState from "../../assets/lottie/emptyState.json";
 import type { BoardProps, Status } from "./types";
 import type { Task } from "../../types/task";
-import Badge from "../Badge";
-import TaskCard from "../TaskCard";
 import { statuses } from "../../data/statuses";
+import Column from "../Column";
 
 const mockTasks: Task[] = [
     {
@@ -40,12 +40,38 @@ const mockTasks: Task[] = [
     },
 ];
 
-const tasksByStatus = statuses.reduce((acc, status) => {
-    acc[status] = mockTasks.filter((t) => t.status === status);
-    return acc;
-}, {} as Record<Status, Task[]>);
-
 const Board: React.FC<BoardProps> = ({ selectedId }) => {
+    const [tasks, setTasks] = useState<Task[]>(mockTasks);
+
+    const tasksByStatus = useMemo(
+        () =>
+            statuses.reduce((acc, status) => {
+                acc[status] = tasks.filter((t) => t.status === status);
+                return acc;
+            }, {} as Record<Status, Task[]>),
+        [tasks]
+    );
+
+    useEffect(() => {
+        return monitorForElements({
+            onDrop({ source, location }) {
+                const destination = location.current.dropTargets[0];
+                if (!destination) return;
+
+                const taskId = source.data.taskId as string;
+                const newStatus = destination.data.status as Status;
+
+                setTasks((prevTasks) =>
+                    prevTasks.map((task) =>
+                        task.id === taskId
+                            ? { ...task, status: newStatus }
+                            : task
+                    )
+                );
+            },
+        });
+    }, []);
+
     return (
         <main className="flex-1 m-4 md:ml-0 p-4 bg-base-200 overflow-auto rounded-2xl">
             {!selectedId ? (
@@ -58,29 +84,13 @@ const Board: React.FC<BoardProps> = ({ selectedId }) => {
                     <p>Create or select a Project to start</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 h-full">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 h-full">
                     {statuses.map((status) => (
-                        <section
+                        <Column
                             key={status}
-                            className="flex flex-col overflow-hidden gap-6 min-h-96"
-                        >
-                            <div className="flex items-center gap-2">
-                                <Badge status={status} />
-                                <h3 className="text-lg font-semibold">
-                                    {status} ({tasksByStatus[status].length})
-                                </h3>
-                            </div>
-                            <div className="flex-1 overflow-y-auto space-y-6 pr-2">
-                                {tasksByStatus[status].map((task) => (
-                                    <TaskCard
-                                        key={task.id}
-                                        title={task.name}
-                                        tags={task.tags}
-                                        status={status}
-                                    />
-                                ))}
-                            </div>
-                        </section>
+                            status={status}
+                            tasks={tasksByStatus[status]}
+                        />
                     ))}
                 </div>
             )}
