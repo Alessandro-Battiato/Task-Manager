@@ -1,12 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { asanaApi } from "../features/api/asanaApi";
+import { apiSlice } from "../features/api/apiSlice";
 
 export const store = configureStore({
     reducer: {
-        [asanaApi.reducerPath]: asanaApi.reducer,
+        [apiSlice.reducerPath]: apiSlice.reducer,
     },
     middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware().concat(asanaApi.middleware),
+        getDefaultMiddleware().concat(apiSlice.middleware),
 });
 
 export type RootState = ReturnType<typeof store.getState>;

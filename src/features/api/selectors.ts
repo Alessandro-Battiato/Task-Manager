@@ -1,8 +1,8 @@
 import { createSelector } from "@reduxjs/toolkit";
-import { asanaApi } from "./asanaApi";
+import { apiSlice } from "./apiSlice";
 
 export const selectTasksByProjectId = (projectId: string) =>
     createSelector(
-        asanaApi.endpoints.getTasks.select(projectId),
+        apiSlice.endpoints.getTasks.select(projectId),
         (result) => result?.data?.data ?? []
     );

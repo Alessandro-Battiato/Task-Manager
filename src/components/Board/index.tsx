@@ -5,7 +5,7 @@ import emptyState from "../../assets/lottie/emptyState.json";
 import type { BoardProps, Status } from "./types";
 import { statuses } from "../../data/statuses";
 import Column from "../Column";
-import { useGetTasksQuery } from "../../features/api/asanaApi";
+import { useGetTasksQuery } from "../../features/api/apiSlice";
 import Skeleton from "../Skeleton";
 import { skeletonCount } from "../../data/skeletonCount";
 

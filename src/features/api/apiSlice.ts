@@ -3,8 +3,8 @@ import type { Task } from "../../types/task";
 
 const ASANA_TOKEN = import.meta.env.VITE_ASANA_TOKEN;
 
-export const asanaApi = createApi({
-    reducerPath: "asanaApi",
+export const apiSlice = createApi({
+    reducerPath: "apiSlice",
     baseQuery: fetchBaseQuery({
         baseUrl: "https://app.asana.com/api/1.0",
         prepareHeaders: (headers) => {
@@ -25,4 +25,4 @@ export const asanaApi = createApi({
     }),
 });
 
-export const { useGetTasksQuery } = asanaApi;
+export const { useGetTasksQuery } = apiSlice;
