@@ -1,3 +1,16 @@
-import type { Status } from "../components/Board/types";
-
-export type Task = { id: string; name: string; status: Status; tags: string[] };
+export type Task = {
+    gid: string;
+    name: string;
+    memberships: Array<{
+        section: {
+            name: string;
+        };
+    }>;
+    tags: Array<{
+        gid: string;
+        name: string;
+    }>;
+    attachments?: Array<{
+        download_url: string;
+    }>;
+};

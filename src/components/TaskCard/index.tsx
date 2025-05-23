@@ -49,13 +49,13 @@ const TaskCard: React.FC<TaskCardProps> = ({
                 <h3 className="font-medium text-sm sm:text-lg">{title}</h3>
                 <div className="flex flex-wrap gap-2">
                     {tags.map((tag) => {
-                        const tagStyle = style(tag);
+                        const tagStyle = style(tag.name);
                         return (
                             <span
-                                key={tag}
+                                key={tag.gid}
                                 className={`badge font-semibold text-xs sm:text-sm ${tagStyle.text} ${tagStyle.bg}`}
                             >
-                                {tag}
+                                {tag.name}
                             </span>
                         );
                     })}
