@@ -1,4 +1,6 @@
-[
-    { "id": "p1", "name": "Design Board" },
-    { "id": "p2", "name": "Learning Board" }
-]
+{
+    "data": [
+        { "gid": "p1", "name": "Design Board" },
+        { "gid": "p2", "name": "Learning Board" }
+    ]
+}

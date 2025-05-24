@@ -122,9 +122,15 @@ const Sidebar: React.FC<SidebarProps> = ({
                 {isLoading || error ? (
                     <div className="flex-1 flex items-center justify-center">
                         {isLoading ? (
-                            <span className="loading loading-spinner loading-lg"></span>
+                            <span
+                                data-testid="projects-loading"
+                                className="loading loading-spinner loading-lg"
+                            ></span>
                         ) : (
-                            <p className="text-error font-semibold">
+                            <p
+                                data-testid="projects-error"
+                                className="text-error font-semibold"
+                            >
                                 Failed to load projects
                             </p>
                         )}
@@ -212,10 +218,16 @@ const Sidebar: React.FC<SidebarProps> = ({
                     </button>
                     {isLoading ? (
                         <div className="flex-1 flex justify-center items-center">
-                            <span className="loading loading-spinner loading-lg"></span>
+                            <span
+                                data-testid="mobile-projects-loading"
+                                className="loading loading-spinner loading-lg"
+                            ></span>
                         </div>
                     ) : error ? (
-                        <div className="flex-1 flex flex-col justify-center items-center text-error">
+                        <div
+                            data-testid="mobile-projects-error"
+                            className="flex-1 flex flex-col justify-center items-center text-error"
+                        >
                             <p className="font-semibold mb-2">
                                 Failed to load projects
                             </p>

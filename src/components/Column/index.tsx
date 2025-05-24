@@ -6,6 +6,10 @@ import type { ColumnProps } from "./types";
 import { useSelector } from "react-redux";
 import { selectTasksByProjectId } from "../../features/api/selectors";
 
+const generateTestId = (status: string) => {
+    return `column-${status.replace(/ /g, "")}`;
+};
+
 const Column: React.FC<ColumnProps> = ({ status, selectedId }) => {
     const [isDraggedOver, setIsDraggedOver] = useState(false);
 
@@ -34,13 +38,14 @@ const Column: React.FC<ColumnProps> = ({ status, selectedId }) => {
     return (
         <section
             ref={ref}
+            data-testid={generateTestId(status)}
             className={`flex flex-col overflow-hidden gap-6 min-h-96 p-2 rounded-lg transition-colors ${
                 isDraggedOver
                     ? "bg-primary/10 border-2 border-primary border-dashed"
                     : ""
             }`}
         >
-            <div className="flex items-center gap-2">
+            <div data-testid="status-badge" className="flex items-center gap-2">
                 <Badge status={status} />
                 <h3 className="text-lg font-semibold">
                     {status} ({tasks.length})
