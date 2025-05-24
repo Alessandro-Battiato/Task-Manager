@@ -1,5 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type { Task } from "../../types/task";
+import type { Project } from "../../types/project";
 
 const ASANA_TOKEN = import.meta.env.VITE_ASANA_TOKEN;
 
@@ -22,7 +23,16 @@ export const apiSlice = createApi({
                 },
             }),
         }),
+        getProjects: builder.query<{ data: Project[] }, void>({
+            query: (workspaceId) => ({
+                url: `/projects`,
+                params: {
+                    workspace: workspaceId,
+                    opt_fields: "name",
+                },
+            }),
+        }),
     }),
 });
 
-export const { useGetTasksQuery } = apiSlice;
+export const { useGetTasksQuery, useGetProjectsQuery } = apiSlice;

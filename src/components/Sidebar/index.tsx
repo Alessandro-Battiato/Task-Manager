@@ -1,12 +1,9 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useMemo } from "react";
 import type { SidebarProps } from "./types";
-import type { Project } from "../../types/project";
 import ProjectButton from "../ProjectButton";
+import { useGetProjectsQuery } from "../../features/api/apiSlice";
 
-const mockProjects: Project[] = [
-    { id: "p1", name: "Design Board" },
-    { id: "p2", name: "Learning Board" },
-];
+const WORKSPACE_ID = import.meta.env.VITE_WORSKPACE_ID;
 
 const Sidebar: React.FC<SidebarProps> = ({
     selectedId,
@@ -14,8 +11,11 @@ const Sidebar: React.FC<SidebarProps> = ({
     toggle,
     theme,
 }) => {
+    const { data, isLoading, error } = useGetProjectsQuery(WORKSPACE_ID);
+
+    const projects = useMemo(() => data?.data, [data]) ?? [];
+
     const [isSidebarOpen, setSidebarOpen] = useState(false);
-    const [projects] = useState<Project[]>(mockProjects);
 
     const handleProjectSelect = useCallback(
         (id: string) => {
@@ -119,21 +119,37 @@ const Sidebar: React.FC<SidebarProps> = ({
                 data-testid="sidebar"
                 className="hidden md:flex w-60 min-w-72 p-4 flex-col"
             >
-                <h2 className="text-lg font-bold mb-4">Projects</h2>
-                <ul
-                    data-testid="projects-list"
-                    className="space-y-2 flex-1 overflow-auto"
-                >
-                    {projects.map((p) => (
-                        <li data-testid={p.id} key={p.id}>
-                            <ProjectButton
-                                onClick={() => handleProjectSelect(p.id)}
-                                isSelected={selectedId === p.id}
-                                cta={p.name}
-                            />
-                        </li>
-                    ))}
-                </ul>
+                {isLoading || error ? (
+                    <div className="flex-1 flex items-center justify-center">
+                        {isLoading ? (
+                            <span className="loading loading-spinner loading-lg"></span>
+                        ) : (
+                            <p className="text-error font-semibold">
+                                Failed to load projects
+                            </p>
+                        )}
+                    </div>
+                ) : (
+                    <>
+                        <h2 className="text-lg font-bold mb-4">Projects</h2>
+                        <ul
+                            data-testid="projects-list"
+                            className="space-y-2 flex-1 overflow-auto"
+                        >
+                            {projects.map((p) => (
+                                <li data-testid={p.gid} key={p.gid}>
+                                    <ProjectButton
+                                        onClick={() =>
+                                            handleProjectSelect(p.gid)
+                                        }
+                                        isSelected={selectedId === p.gid}
+                                        cta={p.name}
+                                    />
+                                </li>
+                            ))}
+                        </ul>
+                    </>
+                )}
                 <div className="flex justify-center">
                     <div className="tabs tabs-box w-full rounded-xl">
                         <label
@@ -194,19 +210,35 @@ const Sidebar: React.FC<SidebarProps> = ({
                     >
                         ✕
                     </button>
-                    <h2 className="text-lg font-bold mb-4">Projects</h2>
-                    <ul className="space-y-2 flex-1 overflow-auto">
-                        {projects.map((p) => (
-                            <li data-testid={p.id} key={p.id}>
-                                <ProjectButton
-                                    data-testid={`project-${p.id}`}
-                                    onClick={() => handleProjectSelect(p.id)}
-                                    isSelected={selectedId === p.id}
-                                    cta={p.name}
-                                />
-                            </li>
-                        ))}
-                    </ul>
+                    {isLoading ? (
+                        <div className="flex-1 flex justify-center items-center">
+                            <span className="loading loading-spinner loading-lg"></span>
+                        </div>
+                    ) : error ? (
+                        <div className="flex-1 flex flex-col justify-center items-center text-error">
+                            <p className="font-semibold mb-2">
+                                Failed to load projects
+                            </p>
+                        </div>
+                    ) : (
+                        <>
+                            <h2 className="text-lg font-bold mb-4">Projects</h2>
+                            <ul className="space-y-2 flex-1 overflow-auto">
+                                {projects.map((p) => (
+                                    <li data-testid={p.gid} key={p.gid}>
+                                        <ProjectButton
+                                            data-testid={`project-${p.gid}`}
+                                            onClick={() =>
+                                                handleProjectSelect(p.gid)
+                                            }
+                                            isSelected={selectedId === p.gid}
+                                            cta={p.name}
+                                        />
+                                    </li>
+                                ))}
+                            </ul>
+                        </>
+                    )}
                 </div>
             )}
         </>

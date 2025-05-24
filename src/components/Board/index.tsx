@@ -10,8 +10,7 @@ import Skeleton from "../Skeleton";
 import { skeletonCount } from "../../data/skeletonCount";
 
 const Board: React.FC<BoardProps> = ({ selectedId }) => {
-    // TO DO: Replace hard coded project id with real ids once requests for projects are implemented
-    const { isLoading, error } = useGetTasksQuery("1210218850462885", {
+    const { isLoading, error } = useGetTasksQuery(selectedId, {
         skip: !selectedId,
     });
 
@@ -83,7 +82,7 @@ const Board: React.FC<BoardProps> = ({ selectedId }) => {
                             <Column
                                 key={status}
                                 status={status}
-                                selectedId={"1210218850462885"} // TO DO: replace hard-coded ID
+                                selectedId={selectedId}
                             />
                         ))}
                 </div>
