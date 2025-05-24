@@ -35,3 +35,11 @@
 //     }
 //   }
 // }
+
+Cypress.Commands.add("selectProject", (projectId) => {
+    cy.get(`[data-testid="${projectId}"]`).click();
+});
+
+Cypress.Commands.add("openMobileSidebar", () => {
+    cy.get('[data-testid="mobile-menu-button"]').click();
+});

@@ -42,8 +42,12 @@ const Sidebar: React.FC<SidebarProps> = ({
 
     return (
         <>
-            <header className="md:hidden flex items-center justify-between p-4">
+            <header
+                data-testid="mobile-header"
+                className="md:hidden flex items-center justify-between p-4"
+            >
                 <button
+                    data-testid="mobile-menu-button"
                     className="btn btn-square btn-ghost"
                     onClick={toggleSidebar}
                 >
@@ -64,8 +68,9 @@ const Sidebar: React.FC<SidebarProps> = ({
                 </button>
                 <label className="toggle text-base-content">
                     <input
+                        data-testid="mobile-theme-toggle"
                         type="checkbox"
-                        value="synthwave"
+                        defaultChecked={theme === "light"}
                         className="theme-controller"
                         onClick={toggle}
                     />
@@ -110,11 +115,17 @@ const Sidebar: React.FC<SidebarProps> = ({
                 </label>
             </header>
 
-            <aside className="hidden md:flex w-60 min-w-72 p-4 flex-col">
+            <aside
+                data-testid="sidebar"
+                className="hidden md:flex w-60 min-w-72 p-4 flex-col"
+            >
                 <h2 className="text-lg font-bold mb-4">Projects</h2>
-                <ul className="space-y-2 flex-1 overflow-auto">
+                <ul
+                    data-testid="projects-list"
+                    className="space-y-2 flex-1 overflow-auto"
+                >
                     {projects.map((p) => (
-                        <li key={p.id}>
+                        <li data-testid={p.id} key={p.id}>
                             <ProjectButton
                                 onClick={() => handleProjectSelect(p.id)}
                                 isSelected={selectedId === p.id}
@@ -137,6 +148,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                                 <path d="M21.64,13a1,1,0,0,0-1.05-.14,8.05,8.05,0,0,1-3.37.73A8.15,8.15,0,0,1,9.08,5.49a8.59,8.59,0,0,1,.25-2A1,1,0,0,0,8,2.36,10.14,10.14,0,1,0,22,14.05,1,1,0,0,0,21.64,13Zm-9.5,6.69A8.14,8.14,0,0,1,7.08,5.22v.27A10.15,10.15,0,0,0,17.22,15.63a9.79,9.79,0,0,0,2.1-.22A8.11,8.11,0,0,1,12.14,19.73Z" />
                             </svg>
                             <input
+                                data-testid="theme-dark"
                                 type="radio"
                                 id="tab-dark"
                                 name="theme_tabs"
@@ -157,6 +169,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                                 <path d="M5.64,17l-.71.71a1,1,0,0,0,0,1.41,1,1,0,0,0,1.41,0l.71-.71A1,1,0,0,0,5.64,17ZM5,12a1,1,0,0,0-1-1H3a1,1,0,0,0,0,2H4A1,1,0,0,0,5,12Zm7-7a1,1,0,0,0,1-1V3a1,1,0,0,0-2,0V4A1,1,0,0,0,12,5ZM5.64,7.05a1,1,0,0,0,.7.29,1,1,0,0,0,.71-.29,1,1,0,0,0,0-1.41l-.71-.71A1,1,0,0,0,4.93,6.34Zm12,.29a1,1,0,0,0,.7-.29l.71-.71a1,1,0,1,0-1.41-1.41L17,5.64a1,1,0,0,0,0,1.41A1,1,0,0,0,17.66,7.34ZM21,11H20a1,1,0,0,0,0,2h1a1,1,0,0,0,0-2Zm-9,8a1,1,0,0,0-1,1v1a1,1,0,0,0,2,0V20A1,1,0,0,0,12,19ZM18.36,17A1,1,0,0,0,17,18.36l.71.71a1,1,0,0,0,1.41,0,1,1,0,0,0,0-1.41ZM12,6.5A5.5,5.5,0,1,0,17.5,12,5.51,5.51,0,0,0,12,6.5Zm0,9A3.5,3.5,0,1,1,15.5,12,3.5,3.5,0,0,1,12,15.5Z" />
                             </svg>
                             <input
+                                data-testid="theme-light"
                                 type="radio"
                                 id="tab-light"
                                 name="theme_tabs"
@@ -170,8 +183,12 @@ const Sidebar: React.FC<SidebarProps> = ({
             </aside>
 
             {isSidebarOpen && (
-                <div className="fixed inset-0 bg-base-200 z-50 flex flex-col p-4">
+                <div
+                    data-testid="mobile-sidebar"
+                    className="fixed inset-0 bg-base-200 z-50 flex flex-col p-4"
+                >
                     <button
+                        data-testid="close-sidebar-btn"
                         className="self-end btn btn-ghost btn-square"
                         onClick={toggleSidebar}
                     >
@@ -180,8 +197,9 @@ const Sidebar: React.FC<SidebarProps> = ({
                     <h2 className="text-lg font-bold mb-4">Projects</h2>
                     <ul className="space-y-2 flex-1 overflow-auto">
                         {projects.map((p) => (
-                            <li key={p.id}>
+                            <li data-testid={p.id} key={p.id}>
                                 <ProjectButton
+                                    data-testid={`project-${p.id}`}
                                     onClick={() => handleProjectSelect(p.id)}
                                     isSelected={selectedId === p.id}
                                     cta={p.name}

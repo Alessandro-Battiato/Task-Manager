@@ -41,9 +41,15 @@ const Board: React.FC<BoardProps> = ({ selectedId }) => {
     );
 
     return (
-        <main className="flex-1 m-4 md:ml-0 p-4 bg-base-200 overflow-auto rounded-2xl">
+        <main
+            data-testid="board"
+            className="flex-1 m-4 md:ml-0 p-4 bg-base-200 overflow-auto rounded-2xl"
+        >
             {showEmptyState && (
-                <div className="h-full flex flex-col items-center justify-center text-base-content">
+                <div
+                    data-testid="empty-state"
+                    className="h-full flex flex-col items-center justify-center text-base-content"
+                >
                     <Lottie
                         className="max-w-sm"
                         animationData={emptyState}

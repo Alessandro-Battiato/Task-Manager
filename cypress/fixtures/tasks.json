@@ -6,7 +6,7 @@
             "memberships": [
                 {
                     "section": {
-                        "name": "To Do"
+                        "name": "Backlog"
                     }
                 }
             ],
@@ -44,7 +44,7 @@
             "memberships": [
                 {
                     "section": {
-                        "name": "Done"
+                        "name": "In Review"
                     }
                 }
             ],
@@ -52,6 +52,23 @@
                 {
                     "gid": "t4",
                     "name": "documentation"
+                }
+            ]
+        },
+        {
+            "gid": "4",
+            "name": "Schedule Call",
+            "memberships": [
+                {
+                    "section": {
+                        "name": "Done"
+                    }
+                }
+            ],
+            "tags": [
+                {
+                    "gid": "t5",
+                    "name": "organization"
                 }
             ]
         }

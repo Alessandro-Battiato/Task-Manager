@@ -1,8 +1,10 @@
 {
     "files": [],
     "compilerOptions": {
-        "module": "ESNext"
+        "module": "ESNext",
+        "types": ["cypress", "node", "cypress-plugin-tab/src"] // Temp workaround https://github.com/kuceb/cypress-plugin-tab/issues/19#issuecomment-656615921
     },
+    "include": ["cypress", "src"],
     "references": [
         { "path": "./tsconfig.app.json" },
         { "path": "./tsconfig.node.json" }
