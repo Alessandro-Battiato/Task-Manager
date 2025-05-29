@@ -4,6 +4,8 @@ import type { ProjectButtonProps } from "./types";
 const ProjectButton: React.FC<ProjectButtonProps> = ({
     cta,
     isSelected,
+    isCreateButton = false,
+    icon,
     onClick,
 }) => {
     return (
@@ -15,7 +17,17 @@ const ProjectButton: React.FC<ProjectButtonProps> = ({
             }`}
             onClick={onClick}
         >
-            {cta}
+            {icon && (
+                <span
+                    className={`rounded-full mr-1 ${
+                        isCreateButton ? "bg-base-content text-base-100" : "p-1"
+                    }`}
+                >
+                    {icon}
+                </span>
+            )}
+
+            <span>{cta}</span>
         </button>
     );
 };

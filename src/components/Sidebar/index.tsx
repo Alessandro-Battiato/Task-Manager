@@ -2,6 +2,13 @@ import React, { useCallback, useState, useMemo } from "react";
 import type { SidebarProps } from "./types";
 import ProjectButton from "../ProjectButton";
 import { useGetProjectsQuery } from "../../features/api/apiSlice";
+import { yupResolver } from "@hookform/resolvers/yup";
+import Modal from "../Modal";
+import { FormProvider, useForm } from "react-hook-form";
+import ProjectForm from "../../ProjectForm";
+import { projectSchema } from "../../schemas/projectSchema";
+
+// TO DO: Before sending the project name to the server, you have to join the project name with the selected emoji
 
 const WORKSPACE_ID = import.meta.env.VITE_WORSKPACE_ID;
 
@@ -13,9 +20,14 @@ const Sidebar: React.FC<SidebarProps> = ({
 }) => {
     const { data, isLoading, error } = useGetProjectsQuery(WORKSPACE_ID);
 
+    const formMethods = useForm({
+        resolver: yupResolver(projectSchema),
+    });
+
     const projects = useMemo(() => data?.data, [data]) ?? [];
 
     const [isSidebarOpen, setSidebarOpen] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const handleProjectSelect = useCallback(
         (id: string) => {
@@ -24,6 +36,10 @@ const Sidebar: React.FC<SidebarProps> = ({
         },
         [handleSelectId, isSidebarOpen]
     );
+
+    const toggleModal = useCallback(() => {
+        setIsModalOpen((prev) => !prev);
+    }, []);
 
     const toggleSidebar = useCallback(
         () => setSidebarOpen(!isSidebarOpen),
@@ -153,6 +169,29 @@ const Sidebar: React.FC<SidebarProps> = ({
                                     />
                                 </li>
                             ))}
+
+                            <ProjectButton
+                                onClick={toggleModal}
+                                cta="Add new Project"
+                                isSelected={false}
+                                isCreateButton
+                                icon={
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-4 w-4"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                        strokeWidth={2}
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            d="M12 4v16m8-8H4"
+                                        />
+                                    </svg>
+                                }
+                            />
                         </ul>
                     </>
                 )}
@@ -207,14 +246,27 @@ const Sidebar: React.FC<SidebarProps> = ({
             {isSidebarOpen && (
                 <div
                     data-testid="mobile-sidebar"
-                    className="fixed inset-0 bg-base-200 z-50 flex flex-col p-4"
+                    className="fixed inset-0 md:hidden bg-base-100 z-50 flex flex-col p-4"
                 >
                     <button
                         data-testid="close-sidebar-btn"
                         className="self-end btn btn-ghost btn-square"
                         onClick={toggleSidebar}
                     >
-                        ✕
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth={2}
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M6 18L18 6M6 6l12 12"
+                            />
+                        </svg>
                     </button>
                     {isLoading ? (
                         <div className="flex-1 flex justify-center items-center">
@@ -248,11 +300,42 @@ const Sidebar: React.FC<SidebarProps> = ({
                                         />
                                     </li>
                                 ))}
+                                <ProjectButton
+                                    onClick={toggleModal}
+                                    cta="Add new Project"
+                                    isSelected={false}
+                                    isCreateButton
+                                    icon={
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            className="h-4 w-4"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                            strokeWidth={2}
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                d="M12 4v16m8-8H4"
+                                            />
+                                        </svg>
+                                    }
+                                />
                             </ul>
                         </>
                     )}
                 </div>
             )}
+            <Modal
+                title="New Project"
+                isOpen={isModalOpen}
+                onClose={toggleModal}
+            >
+                <FormProvider {...formMethods}>
+                    <ProjectForm />
+                </FormProvider>
+            </Modal>
         </>
     );
 };
