@@ -48,9 +48,7 @@ const ProjectList: React.FC<ProjectListProps> = ({
                 {(data?.data ?? []).map((p) => (
                     <li data-testid={p.gid} key={p.gid}>
                         <ProjectButton
-                            {...(isMobile && {
-                                "data-testid": `project-${p.gid}`,
-                            })}
+                            data-testid={`project-btn-${p.gid}`}
                             onDeleteClick={() => handleDelete(p.gid)}
                             onClick={() => onProjectSelect(p.gid)}
                             isSelected={selectedId === p.gid}
@@ -94,7 +92,13 @@ const ProjectList: React.FC<ProjectListProps> = ({
                     isRequestLoading={isLoading}
                     title="Confirm Delete"
                     submitButtonText="Confirm"
+                    submitButtonProps={{
+                        "data-testid": "confirm-delete-btn",
+                    }}
                     cancelButtonText="Cancel"
+                    cancelButtonProps={{
+                        "data-testid": "cancel-delete-btn",
+                    }}
                 >
                     <p>Are you sure you want to delete this project?</p>
                 </Modal>

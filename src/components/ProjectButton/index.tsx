@@ -34,6 +34,7 @@ const ProjectButton: React.FC<ProjectButtonProps> = ({
 
             {!icon && (
                 <span
+                    data-testid={`${dataTestId}-delete-btn`}
                     onClick={(e) => {
                         e.stopPropagation();
                         onDeleteClick();
