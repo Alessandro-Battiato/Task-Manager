@@ -10,7 +10,7 @@ import Skeleton from "../Skeleton";
 import { skeletonCount } from "../../data/skeletonCount";
 
 const Board: React.FC<BoardProps> = ({ selectedId }) => {
-    const { isLoading, error } = useGetTasksQuery(selectedId, {
+    const { isLoading, isFetching, error } = useGetTasksQuery(selectedId, {
         skip: !selectedId,
     });
 
@@ -31,8 +31,8 @@ const Board: React.FC<BoardProps> = ({ selectedId }) => {
     const showEmptyState = useMemo(() => !selectedId, [selectedId]);
     const showError = useMemo(() => selectedId && error, [error, selectedId]);
     const showSkeletons = useMemo(
-        () => selectedId && isLoading && !error,
-        [error, isLoading, selectedId]
+        () => selectedId && (isLoading || isFetching) && !error,
+        [error, isLoading, isFetching, selectedId]
     );
     const showColumns = useMemo(
         () => selectedId && !isLoading && !error,
@@ -80,7 +80,8 @@ const Board: React.FC<BoardProps> = ({ selectedId }) => {
                         skeletonCount.map((count, i) => (
                             <Skeleton key={i} count={count} />
                         ))}
-                    {showColumns &&
+                    {!isFetching &&
+                        showColumns &&
                         statuses.map((status) => (
                             <Column
                                 key={status}

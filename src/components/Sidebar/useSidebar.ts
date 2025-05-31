@@ -52,10 +52,7 @@ export const useSidebar = (handleSelectId: (id: string) => void) => {
     );
 
     const handleCreateProjectSubmit = useCallback(
-        async (formData: {
-            logoIndex: null | undefined;
-            projectName: string;
-        }) => {
+        async (formData: { logoIndex: null | number; projectName: string }) => {
             const selectedEmoji = logoOptions[formData.logoIndex || 0]?.icon;
             const projectNameWithEmoji = `${selectedEmoji} ${formData.projectName}`;
 
