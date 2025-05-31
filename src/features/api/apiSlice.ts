@@ -13,6 +13,7 @@ export const apiSlice = createApi({
             return headers;
         },
     }),
+    tagTypes: ["Project", "Task"],
     endpoints: (builder) => ({
         getTasks: builder.query<{ data: Task[] }, string>({
             query: (projectId) => ({
@@ -22,17 +23,74 @@ export const apiSlice = createApi({
                         "name,memberships.section.name,tags.name,attachments.download_url",
                 },
             }),
+            providesTags: (result, _, projectId) =>
+                result
+                    ? [
+                          ...result.data.map(({ gid }) => ({
+                              type: "Task" as const,
+                              id: gid,
+                          })),
+                          {
+                              type: "Task" as const,
+                              id: "LIST",
+                              parentId: projectId,
+                          },
+                      ]
+                    : [
+                          {
+                              type: "Task" as const,
+                              id: "LIST",
+                              parentId: projectId,
+                          },
+                      ],
         }),
-        getProjects: builder.query<{ data: Project[] }, void>({
+        getProjects: builder.query<{ data: Project[] }, string>({
             query: (workspaceId) => ({
                 url: `/projects`,
                 params: {
                     workspace: workspaceId,
-                    opt_fields: "name",
+                    opt_fields: "name,gid",
                 },
             }),
+            providesTags: (result, _, workspaceId) =>
+                result
+                    ? [
+                          ...result.data.map(({ gid }) => ({
+                              type: "Project" as const,
+                              id: gid,
+                          })),
+                          {
+                              type: "Project" as const,
+                              id: "LIST",
+                              workspace: workspaceId,
+                          },
+                      ]
+                    : [
+                          {
+                              type: "Project" as const,
+                              id: "LIST",
+                              workspace: workspaceId,
+                          },
+                      ],
+        }),
+
+        createProject: builder.mutation({
+            query: (newProjectData) => {
+                return {
+                    url: "/projects",
+                    method: "POST",
+                    body: { data: newProjectData },
+                };
+            },
+            invalidatesTags: (_, __, { workspace }) => [
+                { type: "Project", id: "LIST", workspace },
+            ],
         }),
     }),
 });
 
-export const { useGetTasksQuery, useGetProjectsQuery } = apiSlice;
+export const {
+    useGetTasksQuery,
+    useGetProjectsQuery,
+    useCreateProjectMutation,
+} = apiSlice;

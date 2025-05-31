@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import type { SidebarProps } from "./types";
 import Modal from "../Modal";
 import { FormProvider } from "react-hook-form";
@@ -23,7 +23,13 @@ const Sidebar: React.FC<SidebarProps> = ({
         handleProjectSelect,
         toggleModal,
         toggleSidebar,
+        handleCreateProjectSubmit,
+        isCreatingProject,
     } = useSidebar(handleSelectId);
+
+    const onModalConfirmSubmit = useCallback(() => {
+        formMethods.handleSubmit((data) => handleCreateProjectSubmit(data))();
+    }, [formMethods, handleCreateProjectSubmit]);
 
     return (
         <>
@@ -57,6 +63,8 @@ const Sidebar: React.FC<SidebarProps> = ({
                 title="New Project"
                 isOpen={isModalOpen}
                 onClose={toggleModal}
+                isRequestLoading={isCreatingProject}
+                onConfirm={onModalConfirmSubmit}
                 cancelButtonText="Cancel"
                 submitButtonText="Create Project"
             >

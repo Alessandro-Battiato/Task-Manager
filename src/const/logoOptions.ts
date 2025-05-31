@@ -1,0 +1,15 @@
+export const logoOptions = [
+    { color: "#FF6B6B", icon: "🛠️" },
+    { color: "#4ECDC4", icon: "⚙️" },
+    { color: "#45B7D1", icon: "🚀" },
+    { color: "#96CEB4", icon: "🔑" },
+    { color: "#FFEAA7", icon: "⏰" },
+    { color: "#DDA0DD", icon: "🍄" },
+    { color: "#98D8C8", icon: "👨‍🚀" },
+    { color: "#F7DC6F", icon: "👀" },
+    { color: "#BB8FCE", icon: "🔘" },
+    { color: "#85C1E9", icon: "✈️" },
+    { color: "#F8C471", icon: "👨‍💻" },
+    { color: "#82E0AA", icon: "⭐" },
+    { color: "#F1948A", icon: "📚" },
+];

@@ -1,21 +1,6 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { useFormContext } from "react-hook-form";
-
-const logoOptions = [
-    { color: "#FF6B6B", icon: "🛠️" },
-    { color: "#4ECDC4", icon: "⚙️" },
-    { color: "#45B7D1", icon: "🚀" },
-    { color: "#96CEB4", icon: "🔑" },
-    { color: "#FFEAA7", icon: "⏰" },
-    { color: "#DDA0DD", icon: "🍄" },
-    { color: "#98D8C8", icon: "👨‍🚀" },
-    { color: "#F7DC6F", icon: "👀" },
-    { color: "#BB8FCE", icon: "🔘" },
-    { color: "#85C1E9", icon: "✈️" },
-    { color: "#F8C471", icon: "👨‍💻" },
-    { color: "#82E0AA", icon: "⭐" },
-    { color: "#F1948A", icon: "📚" },
-];
+import { logoOptions } from "../const/logoOptions";
 
 const ProjectForm: React.FC = () => {
     const {
@@ -26,6 +11,13 @@ const ProjectForm: React.FC = () => {
     } = useFormContext();
 
     const selectedIdx = watch("logoIndex");
+
+    const handleLogoSelect = useCallback(
+        (idx: number) => {
+            setValue("logoIndex", idx, { shouldValidate: true });
+        },
+        [setValue]
+    );
 
     return (
         <div className="space-y-6">
@@ -63,21 +55,15 @@ const ProjectForm: React.FC = () => {
                     Logo
                 </label>
                 <input
+                    {...register("logoIndex", { valueAsNumber: true })}
                     type="hidden"
-                    {...register("logoIndex", {
-                        required: "Select a logo",
-                    })}
                 />
                 <div className="grid grid-cols-5 sm:grid-cols-8 gap-2">
                     {logoOptions.map((option, idx) => (
                         <button
                             key={idx}
                             type="button"
-                            onClick={() =>
-                                setValue("logoIndex", idx, {
-                                    shouldValidate: true,
-                                })
-                            }
+                            onClick={() => handleLogoSelect(idx)}
                             className={`
                                 flex cursor-pointer items-center justify-center w-8 h-8 text-base rounded-full
                                 transition-all duration-200 hover:scale-110

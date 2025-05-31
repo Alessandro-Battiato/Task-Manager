@@ -4,6 +4,8 @@ import type { ModalProps } from "./types";
 const Modal: React.FC<ModalProps> = ({
     isOpen,
     onClose = () => {},
+    onConfirm = () => {},
+    isRequestLoading,
     title,
     children,
     submitButtonText,
@@ -100,6 +102,8 @@ const Modal: React.FC<ModalProps> = ({
                     <div className="modal-action justify-start mt-6 space-x-3">
                         <button
                             type="submit"
+                            disabled={isRequestLoading}
+                            onClick={onConfirm}
                             {...submitButtonProps}
                             className={`btn btn-primary font-normal h-8.5 rounded-full ${submitButtonProps.className}`}
                         >

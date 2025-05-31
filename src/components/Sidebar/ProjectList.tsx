@@ -3,7 +3,7 @@ import ProjectButton from "../ProjectButton";
 import type { ProjectListProps } from "./types";
 import { useGetProjectsQuery } from "../../features/api/apiSlice";
 
-const WORKSPACE_ID = import.meta.env.VITE_WORSKPACE_ID;
+const WORKSPACE_ID = import.meta.env.VITE_WORKSPACE_ID;
 
 const ProjectList: React.FC<ProjectListProps> = ({
     selectedId,
