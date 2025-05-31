@@ -1,5 +1,5 @@
 import React from "react";
-import { useFormContext, Controller } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 
 const logoOptions = [
     { color: "#FF6B6B", icon: "🛠️" },
@@ -19,12 +19,13 @@ const logoOptions = [
 
 const ProjectForm: React.FC = () => {
     const {
-        control,
         watch,
+        register,
+        setValue,
         formState: { errors },
     } = useFormContext();
 
-    const selectedLogo = watch("logo");
+    const selectedIdx = watch("logoIndex");
 
     return (
         <div className="space-y-6">
@@ -35,26 +36,24 @@ const ProjectForm: React.FC = () => {
                 >
                     Project name
                 </label>
-                <Controller
-                    name="projectName"
-                    control={control}
-                    render={({ field }) => (
-                        <input
-                            {...field}
-                            id="projectName"
-                            type="text"
-                            placeholder="e.g Default Project"
-                            className={`w-full px-3 py-2 border rounded-xl placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                                errors.projectName
-                                    ? "border-error"
-                                    : "border-gray-600"
-                            }`}
-                        />
-                    )}
+                <input
+                    {...register("projectName")}
+                    id="projectName"
+                    type="text"
+                    placeholder="e.g Default Project"
+                    className={`
+                        w-full px-3 py-2 border rounded-xl placeholder:text-gray-600
+                        focus:outline-none focus:ring-2 focus:ring-blue-500
+                        ${
+                            errors.projectName
+                                ? "border-error"
+                                : "border-gray-600"
+                        }
+                    `}
                 />
                 {errors.projectName && (
                     <p className="mt-1 text-sm text-error">
-                        {errors.projectName.message as string}
+                        {errors.projectName?.message as string}
                     </p>
                 )}
             </div>
@@ -63,34 +62,41 @@ const ProjectForm: React.FC = () => {
                 <label className="block text-xs font-medium text-gray-400 mb-3">
                     Logo
                 </label>
-                <Controller
-                    name="logo"
-                    control={control}
-                    render={({ field }) => (
-                        <div className="grid grid-cols-8 gap-2">
-                            {logoOptions.map((option, index) => (
-                                <button
-                                    key={index}
-                                    type="button"
-                                    onClick={() => field.onChange(option)}
-                                    className={`flex cursor-pointer items-center justify-center w-8 h-8 text-base rounded-full transition-all duration-200 hover:scale-110 ${
-                                        selectedLogo?.color === option.color &&
-                                        selectedLogo?.icon === option.icon
-                                            ? "ring-2 ring-white ring-offset-2 ring-offset-gray-800"
-                                            : "hover:ring-1 hover:ring-gray-400"
-                                    }`}
-                                    style={{ backgroundColor: option.color }}
-                                    aria-label={`Select logo ${option.icon}`}
-                                >
-                                    {option.icon}
-                                </button>
-                            ))}
-                        </div>
-                    )}
+                <input
+                    type="hidden"
+                    {...register("logoIndex", {
+                        required: "Select a logo",
+                    })}
                 />
-                {errors.logo && (
+                <div className="grid grid-cols-5 sm:grid-cols-8 gap-2">
+                    {logoOptions.map((option, idx) => (
+                        <button
+                            key={idx}
+                            type="button"
+                            onClick={() =>
+                                setValue("logoIndex", idx, {
+                                    shouldValidate: true,
+                                })
+                            }
+                            className={`
+                                flex cursor-pointer items-center justify-center w-8 h-8 text-base rounded-full
+                                transition-all duration-200 hover:scale-110
+                                ${
+                                    selectedIdx === idx
+                                        ? "ring-2 ring-white ring-offset-2 ring-offset-gray-800"
+                                        : "hover:ring-1 hover:ring-gray-400"
+                                }
+                            `}
+                            style={{ backgroundColor: option.color }}
+                            aria-label={`Select logo ${option.icon}`}
+                        >
+                            {option.icon}
+                        </button>
+                    ))}
+                </div>
+                {errors.logoIndex && (
                     <p className="mt-2 text-sm text-error">
-                        {errors.logo.message as string}
+                        {errors.logoIndex?.message as string}
                     </p>
                 )}
             </div>

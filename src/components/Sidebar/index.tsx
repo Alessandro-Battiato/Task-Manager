@@ -331,6 +331,8 @@ const Sidebar: React.FC<SidebarProps> = ({
                 title="New Project"
                 isOpen={isModalOpen}
                 onClose={toggleModal}
+                cancelButtonText="Cancel"
+                submitButtonText="Create Project"
             >
                 <FormProvider {...formMethods}>
                     <ProjectForm />
