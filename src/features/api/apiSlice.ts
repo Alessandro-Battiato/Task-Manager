@@ -86,6 +86,17 @@ export const apiSlice = createApi({
                 { type: "Project", id: "LIST", workspace },
             ],
         }),
+
+        deleteProject: builder.mutation<void, string>({
+            query: (projectId) => ({
+                url: `/projects/${projectId}`,
+                method: "DELETE",
+            }),
+            invalidatesTags: (_, __, projectId) => [
+                { type: "Project", id: projectId },
+                { type: "Project", id: "LIST" },
+            ],
+        }),
     }),
 });
 
@@ -93,4 +104,5 @@ export const {
     useGetTasksQuery,
     useGetProjectsQuery,
     useCreateProjectMutation,
+    useDeleteProjectMutation,
 } = apiSlice;
