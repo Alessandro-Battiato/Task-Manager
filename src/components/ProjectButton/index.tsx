@@ -7,9 +7,11 @@ const ProjectButton: React.FC<ProjectButtonProps> = ({
     isCreateButton = false,
     icon,
     onClick,
+    "data-testid": dataTestId,
 }) => {
     return (
         <button
+            data-testid={dataTestId}
             className={`btn btn-ghost rounded-3xl border-2 w-full justify-start ${
                 isSelected
                     ? "border-primary"

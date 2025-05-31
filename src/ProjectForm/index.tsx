@@ -31,6 +31,7 @@ const ProjectForm: React.FC = () => {
                 <input
                     {...register("projectName")}
                     id="projectName"
+                    data-testid="project-name-input"
                     type="text"
                     placeholder="e.g Default Project"
                     className={`
@@ -63,6 +64,7 @@ const ProjectForm: React.FC = () => {
                         <button
                             key={idx}
                             type="button"
+                            data-testid={`logo-option-${idx}`}
                             onClick={() => handleLogoSelect(idx)}
                             className={`
                                 flex cursor-pointer items-center justify-center w-8 h-8 text-base rounded-full

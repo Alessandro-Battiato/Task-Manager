@@ -17,9 +17,7 @@ const ProjectList: React.FC<ProjectListProps> = ({
         <>
             <h2 className="text-lg font-bold mb-4">Projects</h2>
             <ul
-                data-testid={
-                    isMobile ? "mobile-projects-list" : "projects-list"
-                }
+                data-testid={isMobile ? "mobile-project-list" : "project-list"}
                 className="space-y-2 flex-1 overflow-auto"
             >
                 {(data?.data ?? []).map((p) => (
@@ -37,6 +35,11 @@ const ProjectList: React.FC<ProjectListProps> = ({
 
                 <ProjectButton
                     onClick={onAddProject}
+                    data-testid={
+                        isMobile
+                            ? "create-project-btn-mobile"
+                            : "create-project-btn-desktop"
+                    }
                     cta="Add new Project"
                     isSelected={false}
                     isCreateButton

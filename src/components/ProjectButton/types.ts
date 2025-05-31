@@ -6,4 +6,5 @@ export interface ProjectButtonProps {
     isSelected: boolean;
     icon?: React.ReactNode;
     isCreateButton?: boolean;
+    "data-testid"?: string;
 }

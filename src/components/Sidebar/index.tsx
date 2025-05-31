@@ -67,6 +67,10 @@ const Sidebar: React.FC<SidebarProps> = ({
                 onConfirm={onModalConfirmSubmit}
                 cancelButtonText="Cancel"
                 submitButtonText="Create Project"
+                submitButtonProps={{
+                    "data-testid": "create-project-submit",
+                }}
+                modalBoxClassName="data-[testid=create-project-modal]"
             >
                 <FormProvider {...formMethods}>
                     <ProjectForm />

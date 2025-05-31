@@ -9,8 +9,12 @@ export interface ModalProps {
     children?: ReactNode;
     submitButtonText?: string;
     cancelButtonText?: string;
-    submitButtonProps?: React.ButtonHTMLAttributes<HTMLButtonElement>;
-    cancelButtonProps?: React.ButtonHTMLAttributes<HTMLButtonElement>;
+    submitButtonProps?: React.ButtonHTMLAttributes<HTMLButtonElement> & {
+        "data-testid"?: string;
+    };
+    cancelButtonProps?: React.ButtonHTMLAttributes<HTMLButtonElement> & {
+        "data-testid"?: string;
+    };
     hideActions?: boolean;
     modalBoxClassName?: string;
 }
