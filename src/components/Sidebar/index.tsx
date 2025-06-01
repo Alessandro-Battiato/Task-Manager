@@ -2,7 +2,7 @@ import React, { useCallback } from "react";
 import type { SidebarProps } from "./types";
 import Modal from "../Modal";
 import { FormProvider } from "react-hook-form";
-import ProjectForm from "../../ProjectForm";
+import ProjectForm from "../ProjectForm/index";
 import { useSidebar } from "./useSidebar";
 import MobileHeader from "./MobileHeader";
 import DesktopSidebar from "./DesktopSidebar";

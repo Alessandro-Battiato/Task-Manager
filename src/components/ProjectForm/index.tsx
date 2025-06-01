@@ -1,6 +1,6 @@
 import React, { useCallback } from "react";
 import { useFormContext } from "react-hook-form";
-import { logoOptions } from "../const/logoOptions";
+import { logoOptions } from "../../const/logoOptions";
 
 const ProjectForm: React.FC = () => {
     const {

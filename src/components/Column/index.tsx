@@ -5,6 +5,7 @@ import TaskCard from "../TaskCard";
 import type { ColumnProps } from "./types";
 import { useSelector } from "react-redux";
 import { selectTasksByProjectId } from "../../features/api/selectors";
+import AddTaskButton from "../AddTaskButton";
 
 const generateTestId = (status: string) => {
     return `column-${status.replace(/ /g, "")}`;
@@ -61,6 +62,7 @@ const Column: React.FC<ColumnProps> = ({ status, selectedId }) => {
                         status={status}
                     />
                 ))}
+                {status === "Backlog" && <AddTaskButton />}
             </div>
         </section>
     );
