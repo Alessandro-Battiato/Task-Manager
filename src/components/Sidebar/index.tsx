@@ -25,6 +25,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         toggleSidebar,
         handleCreateProjectSubmit,
         isCreatingProject,
+        isCreatingSections,
     } = useSidebar(handleSelectId);
 
     const onModalConfirmSubmit = useCallback(() => {
@@ -63,7 +64,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 title="New Project"
                 isOpen={isModalOpen}
                 onClose={toggleModal}
-                isRequestLoading={isCreatingProject}
+                isRequestLoading={isCreatingProject || isCreatingSections}
                 onConfirm={onModalConfirmSubmit}
                 cancelButtonText="Cancel"
                 submitButtonText="Create Project"

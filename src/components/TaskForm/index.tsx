@@ -4,19 +4,17 @@ import Select from "react-select";
 import { tagStyles } from "../../types/tagStyles";
 import { statuses } from "../../data/statuses";
 import { getSelectStyles } from "../../utils/getSelectStyles";
+import { useGetTagsQuery } from "../../features/api/apiSlice";
 import CustomSingleValue from "./CustomSingleValue";
 
-const availableTags = Object.keys(tagStyles);
-
-const tagOptions = availableTags.map((tag) => ({
-    label: tag,
-    value: tag,
-}));
+const WORKSPACE_ID = import.meta.env.VITE_WORKSPACE_ID;
 
 const TaskForm: React.FC = () => {
     const theme = localStorage.getItem("theme");
-
     const isDark = useMemo(() => theme === "dark", [theme]);
+
+    const { data: tagsData, isLoading: tagsLoading } =
+        useGetTagsQuery(WORKSPACE_ID);
 
     const {
         register,
@@ -27,6 +25,17 @@ const TaskForm: React.FC = () => {
     } = useFormContext();
 
     const image = watch("image") as File | null;
+
+    const tagOptions = useMemo(() => {
+        if (!tagsData?.data) return [];
+
+        return tagsData.data
+            .filter((tag) => tagStyles[tag.name])
+            .map((tag) => ({
+                label: tag.name,
+                value: tag.gid,
+            }));
+    }, [tagsData]);
 
     const handleImageChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -149,6 +158,7 @@ const TaskForm: React.FC = () => {
                             isMulti
                             isClearable={false}
                             options={tagOptions}
+                            isLoading={tagsLoading}
                             placeholder="Select one or more tags"
                             value={tagOptions.filter((opt) =>
                                 field.value?.includes(opt.value)

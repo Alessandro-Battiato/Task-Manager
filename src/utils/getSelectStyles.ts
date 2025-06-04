@@ -61,7 +61,7 @@ export const getSelectStyles = (
         color: isDark ? "#ffffff" : "#111827",
     }),
     multiValue: (base, { data }) => {
-        const tag = vanillaTagStyles[data.value] || {
+        const tag = vanillaTagStyles[data.label] || {
             bg: isDark ? "#4b5563" : "#e5e7eb",
             text: isDark ? "#ffffff" : "#111827",
         };
@@ -76,10 +76,11 @@ export const getSelectStyles = (
         };
     },
     multiValueLabel: (base, { data }) => {
-        const vanillaStyleKey = data.value as string;
-        const tag = vanillaTagStyles[vanillaStyleKey] || {
+        const labelKey = data.label as string;
+        const tag = vanillaTagStyles[labelKey] || {
             text: isDark ? "#ffffff" : "#1f2937",
         };
+
         return {
             ...base,
             color: tag.text,

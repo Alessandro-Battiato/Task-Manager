@@ -13,7 +13,7 @@ export const apiSlice = createApi({
             return headers;
         },
     }),
-    tagTypes: ["Project", "Task"],
+    tagTypes: ["Project", "Task", "Section"],
     endpoints: (builder) => ({
         getTasks: builder.query<{ data: Task[] }, string>({
             query: (projectId) => ({
@@ -43,6 +43,92 @@ export const apiSlice = createApi({
                               parentId: projectId,
                           },
                       ],
+        }),
+        createTask: builder.mutation({
+            query: ({ projectId, taskData }) => ({
+                url: `/tasks`,
+                method: "POST",
+                body: {
+                    data: {
+                        ...taskData,
+                        projects: [projectId],
+                    },
+                },
+            }),
+            invalidatesTags: (_, __, { projectId }) => [
+                { type: "Task", id: "LIST", parentId: projectId },
+            ],
+        }),
+        getTags: builder.query<
+            { data: Array<{ gid: string; name: string }> },
+            string
+        >({
+            query: (workspaceId) => ({
+                url: `/tags`,
+                params: {
+                    workspace: workspaceId,
+                    opt_fields: "name,gid",
+                },
+            }),
+            providesTags: (result) =>
+                result
+                    ? result.data.map((task) => ({
+                          type: "Task",
+                          id: task.gid,
+                      }))
+                    : [],
+        }),
+        getProjectSections: builder.query<
+            { data: Array<{ gid: string; name: string }> },
+            string
+        >({
+            query: (projectId) => ({
+                url: `/projects/${projectId}/sections`,
+                params: { opt_fields: "name,gid" },
+            }),
+            providesTags: (result, _, projectId) =>
+                result
+                    ? [
+                          ...result.data.map(({ gid }) => ({
+                              type: "Section" as const,
+                              id: gid,
+                              project: projectId,
+                          })),
+                          {
+                              type: "Section" as const,
+                              id: "LIST",
+                              parentId: projectId,
+                          },
+                      ]
+                    : [
+                          {
+                              type: "Section" as const,
+                              id: "LIST",
+                              parentId: projectId,
+                          },
+                      ],
+        }),
+        uploadAttachment: builder.mutation<
+            { data: { gid: string; download_url: string } },
+            { file: File; parent: string }
+        >({
+            query: ({ file, parent }) => {
+                const formData = new FormData();
+                formData.append("file", file);
+                formData.append("parent", parent);
+
+                return {
+                    url: "/attachments",
+                    method: "POST",
+                    body: formData,
+                    prepareHeaders: (headers: {
+                        delete: (arg0: string) => void;
+                    }) => {
+                        headers.delete("content-type");
+                        return headers;
+                    },
+                };
+            },
         }),
         getProjects: builder.query<{ data: Project[] }, string>({
             query: (workspaceId) => ({
@@ -87,6 +173,24 @@ export const apiSlice = createApi({
             ],
         }),
 
+        createSectionInProject: builder.mutation<
+            { data: { gid: string; name: string } },
+            { projectId: string; sectionName: string }
+        >({
+            query: ({ projectId, sectionName }) => ({
+                url: `/projects/${projectId}/sections`,
+                method: "POST",
+                body: {
+                    data: {
+                        name: sectionName,
+                    },
+                },
+            }),
+            invalidatesTags: (_, __, { projectId }) => [
+                { type: "Section", id: "LIST", parentId: projectId },
+            ],
+        }),
+
         deleteProject: builder.mutation<void, string>({
             query: (projectId) => ({
                 url: `/projects/${projectId}`,
@@ -99,10 +203,14 @@ export const apiSlice = createApi({
         }),
     }),
 });
-
 export const {
     useGetTasksQuery,
     useGetProjectsQuery,
+    useGetTagsQuery,
+    useGetProjectSectionsQuery,
+    useUploadAttachmentMutation,
+    useCreateTaskMutation,
     useCreateProjectMutation,
+    useCreateSectionInProjectMutation,
     useDeleteProjectMutation,
 } = apiSlice;

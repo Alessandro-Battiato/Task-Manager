@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import {
     useCreateProjectMutation,
+    useCreateSectionInProjectMutation,
     useGetProjectsQuery,
 } from "../../features/api/apiSlice";
 import { useForm } from "react-hook-form";
@@ -18,6 +19,9 @@ export const useSidebar = (handleSelectId: (id: string) => void) => {
 
     const [createProject, { isLoading: isCreatingProject }] =
         useCreateProjectMutation();
+
+    const [createSection, { isLoading: isCreatingSections }] =
+        useCreateSectionInProjectMutation();
 
     const formMethods = useForm({
         resolver: yupResolver(projectSchema),
@@ -61,8 +65,30 @@ export const useSidebar = (handleSelectId: (id: string) => void) => {
                 workspace: WORKSPACE_ID,
             };
 
+            const defaultSections = [
+                "Backlog",
+                "In Progress",
+                "In Review",
+                "Completed",
+            ];
+
             try {
-                await createProject(projectPayload).unwrap();
+                const projectResponse = await createProject(
+                    projectPayload
+                ).unwrap();
+
+                const projectId = projectResponse.data.gid;
+
+                if (!projectId) {
+                    throw new Error("Project ID not found");
+                }
+
+                await Promise.all(
+                    defaultSections.map((sectionName) =>
+                        createSection({ projectId, sectionName }).unwrap()
+                    )
+                );
+
                 toggleModal();
             } catch (err) {
                 console.error(
@@ -71,7 +97,7 @@ export const useSidebar = (handleSelectId: (id: string) => void) => {
                 );
             }
         },
-        [createProject, toggleModal]
+        [createProject, createSection, toggleModal]
     );
 
     return {
@@ -85,5 +111,6 @@ export const useSidebar = (handleSelectId: (id: string) => void) => {
         toggleSidebar,
         handleCreateProjectSubmit,
         isCreatingProject,
+        isCreatingSections,
     };
 };

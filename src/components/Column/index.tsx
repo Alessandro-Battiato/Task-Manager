@@ -25,9 +25,19 @@ const Column: React.FC<ColumnProps> = ({ status, selectedId }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDraggedOver, setIsDraggedOver] = useState(false);
 
-    const formMethods = useTaskForm({ status });
-
     const toggleModal = useCallback(() => setIsModalOpen((prev) => !prev), []);
+
+    const formMethods = useTaskForm({
+        projectId: selectedId,
+        onSuccess: toggleModal,
+        initialValues: { status },
+    });
+
+    const onModalConfirmSubmit = useCallback(() => {
+        formMethods.handleSubmit((data) =>
+            formMethods.handleCreateTaskSubmit(data)
+        )();
+    }, [formMethods]);
 
     const tasks = useSelector(selectTasksByProjectId(selectedId));
     const filteredTasks = useMemo(
@@ -88,8 +98,8 @@ const Column: React.FC<ColumnProps> = ({ status, selectedId }) => {
                 title="Task details"
                 isOpen={isModalOpen}
                 onClose={toggleModal}
-                // isRequestLoading={isCreatingTask}
-                onConfirm={formMethods.handleSubmit()}
+                isRequestLoading={formMethods.isCreatingTask}
+                onConfirm={onModalConfirmSubmit}
                 cancelButtonText="Cancel"
                 submitButtonText="Save"
             >
