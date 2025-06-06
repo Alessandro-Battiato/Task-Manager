@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import {
     useCreateProjectMutation,
     useCreateSectionInProjectMutation,
+    useDeleteProjectMutation,
     useGetProjectsQuery,
 } from "../../features/api/apiSlice";
 import { useForm } from "react-hook-form";
@@ -23,6 +24,9 @@ export const useSidebar = (handleSelectId: (id: string) => void) => {
     const [createSection, { isLoading: isCreatingSections }] =
         useCreateSectionInProjectMutation();
 
+    const [deleteProject, { isLoading: isDeletingProject }] =
+        useDeleteProjectMutation();
+
     const formMethods = useForm({
         resolver: yupResolver(projectSchema),
         defaultValues: {
@@ -37,6 +41,23 @@ export const useSidebar = (handleSelectId: (id: string) => void) => {
             if (isSidebarOpen) setSidebarOpen(false);
         },
         [handleSelectId, isSidebarOpen]
+    );
+
+    const handleDeleteProject = useCallback(
+        async (id: string) => {
+            try {
+                await deleteProject(id).unwrap();
+
+                handleSelectId("");
+
+                if (isSidebarOpen) setSidebarOpen(false);
+
+                return true;
+            } catch (err) {
+                console.error("Failed to delete project:", err);
+            }
+        },
+        [deleteProject, handleSelectId, isSidebarOpen]
     );
 
     const toggleModal = useCallback(() => {
@@ -107,10 +128,12 @@ export const useSidebar = (handleSelectId: (id: string) => void) => {
         isModalOpen,
         formMethods,
         handleProjectSelect,
+        handleDeleteProject,
         toggleModal,
         toggleSidebar,
         handleCreateProjectSubmit,
         isCreatingProject,
         isCreatingSections,
+        isDeletingProject,
     };
 };

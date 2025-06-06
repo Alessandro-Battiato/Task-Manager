@@ -10,6 +10,8 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({
     error,
     onClose,
     onProjectSelect,
+    onDeleteProject,
+    isRequestLoading,
     onAddProject,
 }) => {
     if (!isOpen) return null;
@@ -46,6 +48,8 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({
                 <ProjectList
                     selectedId={selectedId}
                     onProjectSelect={onProjectSelect}
+                    onDeleteProject={onDeleteProject}
+                    isRequestLoading={isRequestLoading}
                     onAddProject={onAddProject}
                     isMobile
                 />

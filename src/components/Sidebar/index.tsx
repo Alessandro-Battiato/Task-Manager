@@ -21,11 +21,13 @@ const Sidebar: React.FC<SidebarProps> = ({
         isModalOpen,
         formMethods,
         handleProjectSelect,
+        handleDeleteProject,
         toggleModal,
         toggleSidebar,
         handleCreateProjectSubmit,
         isCreatingProject,
         isCreatingSections,
+        isDeletingProject,
     } = useSidebar(handleSelectId);
 
     const onModalConfirmSubmit = useCallback(() => {
@@ -46,6 +48,8 @@ const Sidebar: React.FC<SidebarProps> = ({
                 error={error}
                 theme={theme}
                 onProjectSelect={handleProjectSelect}
+                onDeleteProject={handleDeleteProject}
+                isRequestLoading={isDeletingProject}
                 onAddProject={toggleModal}
                 onThemeChange={toggle}
             />
@@ -57,6 +61,8 @@ const Sidebar: React.FC<SidebarProps> = ({
                 error={error}
                 onClose={toggleSidebar}
                 onProjectSelect={handleProjectSelect}
+                onDeleteProject={handleDeleteProject}
+                isRequestLoading={isDeletingProject}
                 onAddProject={toggleModal}
             />
 

@@ -10,6 +10,8 @@ const DesktopSidebar: React.FC<DesktopSidebarProps> = ({
     error,
     theme,
     onProjectSelect,
+    onDeleteProject,
+    isRequestLoading,
     onAddProject,
     onThemeChange,
 }) => {
@@ -25,6 +27,8 @@ const DesktopSidebar: React.FC<DesktopSidebarProps> = ({
                     <ProjectList
                         selectedId={selectedId}
                         onProjectSelect={onProjectSelect}
+                        onDeleteProject={onDeleteProject}
+                        isRequestLoading={isRequestLoading}
                         onAddProject={onAddProject}
                     />
                 </>

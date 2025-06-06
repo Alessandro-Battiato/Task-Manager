@@ -1,10 +1,7 @@
 import React, { useCallback, useState } from "react";
 import ProjectButton from "../ProjectButton";
 import type { ProjectListProps } from "./types";
-import {
-    useDeleteProjectMutation,
-    useGetProjectsQuery,
-} from "../../features/api/apiSlice";
+import { useGetProjectsQuery } from "../../features/api/apiSlice";
 import Modal from "../Modal";
 
 const WORKSPACE_ID = import.meta.env.VITE_WORKSPACE_ID;
@@ -13,30 +10,24 @@ const ProjectList: React.FC<ProjectListProps> = ({
     selectedId,
     onProjectSelect,
     onAddProject,
+    onDeleteProject,
+    isRequestLoading,
     isMobile = false,
 }) => {
     const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
 
     const { data } = useGetProjectsQuery(WORKSPACE_ID);
-    const [deleteProject, { isLoading }] = useDeleteProjectMutation();
 
     const confirmDelete = useCallback(async () => {
-        if (!projectToDelete) return;
-        try {
-            await deleteProject(projectToDelete).unwrap();
-        } catch (err) {
-            console.error("Delete failed", err);
+        if (projectToDelete !== null) {
+            const resp = await onDeleteProject(projectToDelete);
+            if (resp) setProjectToDelete(null);
         }
-        setProjectToDelete(null);
-    }, [deleteProject, projectToDelete]);
+    }, [onDeleteProject, projectToDelete]);
 
-    const handleDelete = useCallback(
-        (gid: string) => {
-            if (isLoading) return;
-            setProjectToDelete(gid);
-        },
-        [isLoading]
-    );
+    const handleDeleteClick = useCallback((gid: string) => {
+        setProjectToDelete(gid);
+    }, []);
 
     return (
         <>
@@ -49,7 +40,7 @@ const ProjectList: React.FC<ProjectListProps> = ({
                     <li data-testid={p.gid} key={p.gid}>
                         <ProjectButton
                             data-testid={`project-btn-${p.gid}`}
-                            onDeleteClick={() => handleDelete(p.gid)}
+                            onDeleteClick={() => handleDeleteClick(p.gid)}
                             onClick={() => onProjectSelect(p.gid)}
                             isSelected={selectedId === p.gid}
                             cta={p.name}
@@ -89,7 +80,7 @@ const ProjectList: React.FC<ProjectListProps> = ({
                     isOpen={!!projectToDelete}
                     onClose={() => setProjectToDelete(null)}
                     onConfirm={confirmDelete}
-                    isRequestLoading={isLoading}
+                    isRequestLoading={isRequestLoading}
                     title="Confirm Delete"
                     submitButtonText="Confirm"
                     submitButtonProps={{

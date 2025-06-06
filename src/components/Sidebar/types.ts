@@ -13,6 +13,8 @@ export interface MobileHeaderProps {
 
 export interface ProjectListProps {
     selectedId: string | null;
+    isRequestLoading: boolean;
+    onDeleteProject: (id: string) => Promise<true | undefined>;
     onProjectSelect: (id: string) => void;
     onAddProject: () => void;
     isMobile?: boolean;
@@ -32,9 +34,11 @@ export interface StateHandlerProps {
 export interface MobileSidebarProps {
     isOpen: boolean;
     selectedId: string | null;
+    isRequestLoading: boolean;
     isLoading: boolean;
     error: boolean;
     onClose: () => void;
+    onDeleteProject: (id: string) => Promise<true | undefined>;
     onProjectSelect: (id: string) => void;
     onAddProject: () => void;
 }
@@ -42,8 +46,10 @@ export interface MobileSidebarProps {
 export interface DesktopSidebarProps {
     selectedId: string | null;
     isLoading: boolean;
+    isRequestLoading: boolean;
     error: boolean;
     theme: string;
+    onDeleteProject: (id: string) => Promise<true | undefined>;
     onProjectSelect: (id: string) => void;
     onAddProject: () => void;
     onThemeChange: (theme: string) => void;
