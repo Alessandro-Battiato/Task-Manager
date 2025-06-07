@@ -77,7 +77,6 @@ const Sidebar: React.FC<SidebarProps> = ({
                 submitButtonProps={{
                     "data-testid": "create-project-submit",
                 }}
-                modalBoxClassName="data-[testid=create-project-modal]"
             >
                 <FormProvider {...formMethods}>
                     <ProjectForm />

@@ -94,19 +94,24 @@ const Column: React.FC<ColumnProps> = ({ status, selectedId }) => {
                 )}
             </div>
 
-            <Modal
-                title="Task details"
-                isOpen={isModalOpen}
-                onClose={toggleModal}
-                isRequestLoading={formMethods.isCreatingTask}
-                onConfirm={onModalConfirmSubmit}
-                cancelButtonText="Cancel"
-                submitButtonText="Save"
-            >
-                <FormProvider {...formMethods}>
-                    <TaskForm />
-                </FormProvider>
-            </Modal>
+            {status === "Backlog" && (
+                <Modal
+                    title="Task details"
+                    isOpen={isModalOpen}
+                    onClose={toggleModal}
+                    isRequestLoading={formMethods.isCreatingTask}
+                    onConfirm={onModalConfirmSubmit}
+                    cancelButtonText="Cancel"
+                    submitButtonText="Save"
+                    submitButtonProps={{
+                        "data-testid": "create-task-submit",
+                    }}
+                >
+                    <FormProvider {...formMethods}>
+                        <TaskForm />
+                    </FormProvider>
+                </Modal>
+            )}
         </section>
     );
 };

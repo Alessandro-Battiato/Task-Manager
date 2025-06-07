@@ -6,6 +6,7 @@ import { statuses } from "../../data/statuses";
 import { getSelectStyles } from "../../utils/getSelectStyles";
 import { useGetTagsQuery } from "../../features/api/apiSlice";
 import CustomSingleValue from "./CustomSingleValue";
+import CustomOption from "./CustomOption";
 
 const WORKSPACE_ID = import.meta.env.VITE_WORKSPACE_ID;
 
@@ -28,12 +29,12 @@ const TaskForm: React.FC = () => {
 
     const tagOptions = useMemo(() => {
         if (!tagsData?.data) return [];
-
         return tagsData.data
             .filter((tag) => tagStyles[tag.name])
             .map((tag) => ({
                 label: tag.name,
                 value: tag.gid,
+                dataTestId: tag.name,
             }));
     }, [tagsData]);
 
@@ -55,6 +56,7 @@ const TaskForm: React.FC = () => {
                 {image ? (
                     <div className="relative">
                         <img
+                            data-testid="image-preview"
                             src={URL.createObjectURL(image)}
                             alt="Preview"
                             className="w-full h-24 object-cover rounded-md"
@@ -77,6 +79,7 @@ const TaskForm: React.FC = () => {
                     </div>
                 ) : (
                     <input
+                        data-testid="image-upload"
                         type="file"
                         accept="image/*"
                         onChange={handleImageChange}
@@ -86,11 +89,17 @@ const TaskForm: React.FC = () => {
             </div>
 
             <div>
-                <label className="block text-xs font-medium text-gray-400 mb-2">
+                <label
+                    htmlFor="taskName"
+                    className="block text-xs font-medium text-gray-400 mb-2"
+                >
                     Task name
                 </label>
                 <input
                     {...register("taskName")}
+                    name="taskName"
+                    id="taskName"
+                    data-testid="task-name-input"
                     type="text"
                     placeholder="Enter task name here"
                     className={`input bg-transparent text-base w-full font-light ${
@@ -98,7 +107,10 @@ const TaskForm: React.FC = () => {
                     }`}
                 />
                 {errors.taskName && (
-                    <p className="text-sm text-error mt-1">
+                    <p
+                        data-testid="task-name-input-error"
+                        className="text-sm text-error mt-1"
+                    >
                         {errors.taskName.message as string}
                     </p>
                 )}
@@ -112,31 +124,38 @@ const TaskForm: React.FC = () => {
                     name="status"
                     control={control}
                     render={({ field }) => (
-                        <Select
-                            options={statuses.map((status) => ({
-                                label: status,
-                                value: status,
-                            }))}
-                            value={
-                                statuses
-                                    .map((status) => ({
-                                        label: status,
-                                        value: status,
-                                    }))
-                                    .find((opt) => opt.value === field.value) ||
-                                null
-                            }
-                            onChange={(selected) =>
-                                field.onChange(
-                                    (selected as unknown as { value: string })
-                                        .value
-                                )
-                            }
-                            styles={getSelectStyles(isDark)}
-                            components={{
-                                SingleValue: CustomSingleValue,
-                            }}
-                        />
+                        <div data-testid="status-select">
+                            <Select
+                                options={statuses.map((status) => ({
+                                    label: status,
+                                    value: status,
+                                }))}
+                                value={
+                                    statuses
+                                        .map((status) => ({
+                                            label: status,
+                                            value: status,
+                                        }))
+                                        .find(
+                                            (opt) => opt.value === field.value
+                                        ) || null
+                                }
+                                onChange={(selected) =>
+                                    field.onChange(
+                                        (
+                                            selected as unknown as {
+                                                value: string;
+                                            }
+                                        )?.value
+                                    )
+                                }
+                                styles={getSelectStyles(isDark)}
+                                components={{
+                                    SingleValue: CustomSingleValue,
+                                    Option: CustomOption,
+                                }}
+                            />
+                        </div>
                     )}
                 />
                 {errors.status && (
@@ -154,21 +173,31 @@ const TaskForm: React.FC = () => {
                     name="tags"
                     control={control}
                     render={({ field }) => (
-                        <Select
-                            isMulti
-                            isClearable={false}
-                            options={tagOptions}
-                            isLoading={tagsLoading}
-                            placeholder="Select one or more tags"
-                            value={tagOptions.filter((opt) =>
-                                field.value?.includes(opt.value)
-                            )}
-                            onChange={(selected) =>
-                                field.onChange(selected.map((opt) => opt.value))
-                            }
-                            onBlur={field.onBlur}
-                            styles={getSelectStyles(isDark, !!errors.tags)}
-                        />
+                        <div data-testid="tags-select">
+                            <Select
+                                isMulti
+                                isClearable={false}
+                                options={tagOptions}
+                                isLoading={tagsLoading}
+                                placeholder="Select one or more tags"
+                                value={tagOptions.filter(
+                                    (opt) =>
+                                        Array.isArray(field.value) &&
+                                        field.value.includes(opt.value)
+                                )}
+                                onChange={(selected) => {
+                                    const values = selected
+                                        ? selected.map((opt) => opt.value)
+                                        : [];
+                                    field.onChange(values);
+                                }}
+                                onBlur={field.onBlur}
+                                styles={getSelectStyles(isDark, !!errors.tags)}
+                                components={{
+                                    Option: CustomOption,
+                                }}
+                            />
+                        </div>
                     )}
                 />
                 {errors.tags && (

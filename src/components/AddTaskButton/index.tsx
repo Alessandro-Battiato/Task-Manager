@@ -4,6 +4,7 @@ import type { AddTaskButtonProps } from "./types";
 const AddTaskButton: React.FC<AddTaskButtonProps> = ({ onClick }) => {
     return (
         <button
+            data-testid="create-task-btn"
             onClick={onClick}
             className="
                 btn bg-[#D6E2F7] hover:bg-[#C0D3F2] 
