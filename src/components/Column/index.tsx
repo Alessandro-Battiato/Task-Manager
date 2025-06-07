@@ -10,7 +10,10 @@ import Badge from "../Badge";
 import TaskCard from "../TaskCard";
 import type { ColumnProps } from "./types";
 import { useSelector } from "react-redux";
-import { selectTasksByProjectId } from "../../features/api/selectors";
+import {
+    selectSectionIdByStatus,
+    selectTasksByProjectId,
+} from "../../features/api/selectors";
 import AddTaskButton from "../AddTaskButton";
 import TaskForm from "../TaskForm";
 import { FormProvider } from "react-hook-form";
@@ -26,6 +29,8 @@ const Column: React.FC<ColumnProps> = ({ status, selectedId }) => {
     const [isDraggedOver, setIsDraggedOver] = useState(false);
 
     const toggleModal = useCallback(() => setIsModalOpen((prev) => !prev), []);
+
+    const sectionId = useSelector(selectSectionIdByStatus(selectedId, status));
 
     const formMethods = useTaskForm({
         projectId: selectedId,
@@ -54,12 +59,12 @@ const Column: React.FC<ColumnProps> = ({ status, selectedId }) => {
 
         return dropTargetForElements({
             element,
-            getData: () => ({ status }),
+            getData: () => ({ status, sectionId }),
             onDragEnter: () => setIsDraggedOver(true),
             onDragLeave: () => setIsDraggedOver(false),
             onDrop: () => setIsDraggedOver(false),
         });
-    }, [status]);
+    }, [sectionId, status]);
 
     return (
         <section

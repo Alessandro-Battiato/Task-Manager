@@ -59,6 +59,51 @@ export const apiSlice = createApi({
                 { type: "Task", id: "LIST", parentId: projectId },
             ],
         }),
+        updateTask: builder.mutation<
+            Task,
+            { taskId: string; taskData: Partial<Task>; projectId: string }
+        >({
+            query: ({ taskId, taskData }) => ({
+                url: `/tasks/${taskId}`,
+                method: "PUT",
+                body: {
+                    data: taskData,
+                },
+            }),
+            invalidatesTags: (_, __, { taskId, projectId }) => [
+                { type: "Task", id: taskId },
+                { type: "Task", id: "LIST", parentId: projectId },
+            ],
+        }),
+        moveTaskToSection: builder.mutation<
+            void,
+            { sectionId: string; taskId: string; projectId: string }
+        >({
+            query: ({ sectionId, taskId }) => ({
+                url: `/sections/${sectionId}/addTask`,
+                method: "POST",
+                body: {
+                    data: {
+                        task: taskId,
+                    },
+                },
+            }),
+            invalidatesTags: (_, __, { projectId }) => [
+                { type: "Task", id: "LIST", parentId: projectId },
+            ],
+        }),
+        deleteTask: builder.mutation<
+            void,
+            { taskId: string; projectId: string }
+        >({
+            query: ({ taskId }) => ({
+                url: `/tasks/${taskId}`,
+                method: "DELETE",
+            }),
+            invalidatesTags: (_, __, { projectId }) => [
+                { type: "Task", id: "LIST", parentId: projectId },
+            ],
+        }),
         getTags: builder.query<
             { data: Array<{ gid: string; name: string }> },
             string
@@ -210,6 +255,9 @@ export const {
     useGetProjectSectionsQuery,
     useUploadAttachmentMutation,
     useCreateTaskMutation,
+    useUpdateTaskMutation,
+    useDeleteTaskMutation,
+    useMoveTaskToSectionMutation,
     useCreateProjectMutation,
     useCreateSectionInProjectMutation,
     useDeleteProjectMutation,

@@ -1,18 +1,33 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Lottie from "lottie-react";
 import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import emptyState from "../../assets/lottie/emptyState.json";
 import type { BoardProps, Status } from "./types";
 import { statuses } from "../../data/statuses";
 import Column from "../Column";
-import { useGetTasksQuery } from "../../features/api/apiSlice";
+import {
+    apiSlice,
+    useGetTasksQuery,
+    useMoveTaskToSectionMutation,
+} from "../../features/api/apiSlice";
 import Skeleton from "../Skeleton";
 import { skeletonCount } from "../../data/skeletonCount";
+import { useDispatch } from "react-redux";
+import type { AppDispatch } from "../../features/store";
 
 const Board: React.FC<BoardProps> = ({ selectedId }) => {
-    const { isLoading, isFetching, error } = useGetTasksQuery(selectedId, {
+    const {
+        isLoading,
+        isFetching,
+        error,
+        data: tasks,
+    } = useGetTasksQuery(selectedId, {
         skip: !selectedId,
     });
+    const [moveTaskToSection] = useMoveTaskToSectionMutation();
+    const dispatch = useDispatch<AppDispatch>();
+
+    const [isDragUpdateInProgress, setIsDragUpdateInProgress] = useState(false);
 
     useEffect(() => {
         return monitorForElements({
@@ -21,22 +36,59 @@ const Board: React.FC<BoardProps> = ({ selectedId }) => {
                 if (!destination) return;
 
                 const taskId = source.data.taskId as string;
+                const startStatus = source.data.status as Status;
                 const newStatus = destination.data.status as Status;
+                const sectionId = destination.data.sectionId as string;
 
-                // TO DO: Restore drag n drop feature once update request is implemented
+                if (startStatus === newStatus || !sectionId) return;
+
+                setIsDragUpdateInProgress(true);
+
+                const patchResult = dispatch(
+                    apiSlice.util.updateQueryData(
+                        "getTasks",
+                        selectedId,
+                        (draft) => {
+                            const task = draft.data.find(
+                                (t) => t.gid === taskId
+                            );
+                            if (task) {
+                                task.memberships[0].section.name = newStatus;
+                            }
+                        }
+                    )
+                );
+
+                moveTaskToSection({
+                    taskId,
+                    sectionId,
+                    projectId: selectedId,
+                })
+                    .unwrap()
+                    .catch(() => {
+                        patchResult.undo();
+                    });
             },
         });
-    }, []);
+    }, [dispatch, selectedId, tasks, moveTaskToSection]);
+
+    useEffect(() => {
+        if (!isFetching) {
+            setIsDragUpdateInProgress(false);
+        }
+    }, [isFetching]);
 
     const showEmptyState = useMemo(() => !selectedId, [selectedId]);
     const showError = useMemo(() => selectedId && error, [error, selectedId]);
+
     const showSkeletons = useMemo(
-        () => selectedId && (isLoading || isFetching) && !error,
-        [error, isLoading, isFetching, selectedId]
+        () => isLoading || (isFetching && !isDragUpdateInProgress),
+        [isLoading, isFetching, isDragUpdateInProgress]
     );
+
     const showColumns = useMemo(
-        () => selectedId && !isLoading && !error,
-        [error, isLoading, selectedId]
+        () => !showSkeletons && !!tasks && !error,
+        [showSkeletons, tasks, error]
     );
 
     return (
@@ -80,7 +132,7 @@ const Board: React.FC<BoardProps> = ({ selectedId }) => {
                         skeletonCount.map((count, i) => (
                             <Skeleton key={i} count={count} />
                         ))}
-                    {!isFetching &&
+                    {(!isFetching || isDragUpdateInProgress) &&
                         showColumns &&
                         statuses.map((status) => (
                             <Column
