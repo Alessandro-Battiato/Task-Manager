@@ -4,10 +4,17 @@ export type Tag = {
 };
 
 export interface TaskCardProps {
-    title: string;
-    tags: Tag[];
-    img?: string;
-    status: string;
     taskId: string;
-    onClick: (value: string) => void;
+    title: string;
+    img?: string;
+    tags: Array<{
+        gid: string;
+        name: string;
+    }>;
+    status: string;
+    onClick?: () => void;
+    attachments?: Array<{
+        gid: string;
+        download_url: string;
+    }>;
 }

@@ -15,6 +15,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
     img,
     tags,
     status,
+    onClick,
 }) => {
     const [isDragging, setIsDragging] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
@@ -31,9 +32,21 @@ const TaskCard: React.FC<TaskCardProps> = ({
         });
     }, [taskId, status]);
 
+    const handleClick = (e: React.MouseEvent) => {
+        if (isDragging) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (onClick) {
+            onClick();
+        }
+    };
+
     return (
         <div
             ref={ref}
+            onClick={handleClick}
             className={`card rounded-2xl shadow bg-base-100 cursor-pointer transition-transform hover:scale-85 ${
                 isDragging ? "opacity-50 rotate-2 scale-90" : ""
             }`}
@@ -46,7 +59,9 @@ const TaskCard: React.FC<TaskCardProps> = ({
                         alt="Card image"
                     />
                 )}
-                <h3 className="font-medium text-sm sm:text-lg">{title}</h3>
+                <h3 className="font-medium text-sm sm:text-lg truncate">
+                    {title}
+                </h3>
                 <div className="flex flex-wrap gap-2">
                     {tags.map((tag) => {
                         const tagStyle = style(tag.name);

@@ -19,6 +19,7 @@ import TaskForm from "../TaskForm";
 import { FormProvider } from "react-hook-form";
 import { useTaskForm } from "../TaskForm/useTaskForm";
 import Modal from "../Modal";
+import type { Task } from "../../types/task";
 
 const generateTestId = (status: string) => {
     return `column-${status.replace(/ /g, "")}`;
@@ -27,29 +28,107 @@ const generateTestId = (status: string) => {
 const Column: React.FC<ColumnProps> = ({ status, selectedId }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDraggedOver, setIsDraggedOver] = useState(false);
+    const [editingTask, setEditingTask] = useState<Task>();
 
-    const toggleModal = useCallback(() => setIsModalOpen((prev) => !prev), []);
+    const toggleModal = useCallback(() => {
+        setIsModalOpen((prev) => !prev);
+        if (isModalOpen) {
+            setEditingTask(undefined);
+        }
+    }, [isModalOpen]);
 
     const sectionId = useSelector(selectSectionIdByStatus(selectedId, status));
-
-    const formMethods = useTaskForm({
-        projectId: selectedId,
-        onSuccess: toggleModal,
-        initialValues: { status },
-    });
-
-    const onModalConfirmSubmit = useCallback(() => {
-        formMethods.handleSubmit((data) =>
-            formMethods.handleCreateTaskSubmit(data)
-        )();
-    }, [formMethods]);
-
     const tasks = useSelector(selectTasksByProjectId(selectedId));
+
     const filteredTasks = useMemo(
         () =>
             tasks.filter((task) => task.memberships[0].section.name === status),
         [status, tasks]
     );
+
+    const initialValues = useMemo(() => {
+        if (editingTask) {
+            return {
+                taskName: editingTask.name,
+                status: editingTask.memberships[0].section.name,
+                tags: editingTask.tags.map((tag) => tag.gid),
+                image: editingTask?.attachments?.[0]?.download_url,
+                removeExistingImage: false,
+            };
+        }
+        return {
+            status,
+            taskName: "",
+            tags: [],
+            image: null,
+            removeExistingImage: false,
+        };
+    }, [editingTask, status]);
+
+    const {
+        getValues,
+        handleSubmit,
+        handleCreateTaskSubmit,
+        handleUpdateTaskSubmit,
+        isCreatingTask,
+        reset,
+        watch,
+        ...restFormMethods
+    } = useTaskForm({
+        projectId: selectedId,
+        onSuccess: toggleModal,
+        initialValues,
+        isEditing: !!editingTask,
+        taskId: editingTask?.gid,
+        currentStatus: editingTask?.memberships[0].section.name,
+    });
+
+    const handleTaskCardClick = useCallback((task: Task) => {
+        setEditingTask(task);
+        setIsModalOpen(true);
+    }, []);
+
+    const handleAddTaskClick = useCallback(() => {
+        setEditingTask(undefined);
+        setIsModalOpen(true);
+    }, []);
+
+    const hasChanges = useMemo(() => {
+        if (!editingTask) return true;
+
+        const currentValues = getValues();
+
+        const nameChanged = currentValues.taskName !== initialValues.taskName;
+        const statusChanged = currentValues.status !== initialValues.status;
+        const tagsChanged =
+            JSON.stringify(currentValues.tags?.sort()) !==
+            JSON.stringify(initialValues.tags?.sort());
+
+        const imageChanged = currentValues.image !== initialValues.image;
+        const imageRemoved = currentValues.removeExistingImage;
+
+        return (
+            nameChanged ||
+            statusChanged ||
+            tagsChanged ||
+            imageChanged ||
+            imageRemoved
+        );
+    }, [editingTask, initialValues, getValues]);
+
+    const onModalConfirmSubmit = useCallback(() => {
+        if (editingTask) {
+            handleUpdateTaskSubmit(getValues());
+        } else {
+            handleSubmit(handleCreateTaskSubmit)();
+        }
+    }, [
+        editingTask,
+        handleUpdateTaskSubmit,
+        handleSubmit,
+        handleCreateTaskSubmit,
+        getValues,
+    ]);
 
     const ref = useRef<HTMLElement>(null);
 
@@ -65,6 +144,21 @@ const Column: React.FC<ColumnProps> = ({ status, selectedId }) => {
             onDrop: () => setIsDraggedOver(false),
         });
     }, [sectionId, status]);
+
+    useEffect(() => {
+        reset(initialValues);
+    }, [editingTask, reset, initialValues]);
+
+    const formProviderMethods = {
+        getValues,
+        handleSubmit,
+        handleCreateTaskSubmit,
+        handleUpdateTaskSubmit,
+        isCreatingTask,
+        reset,
+        watch,
+        ...restFormMethods,
+    };
 
     return (
         <section
@@ -91,32 +185,35 @@ const Column: React.FC<ColumnProps> = ({ status, selectedId }) => {
                         title={task.name}
                         tags={task.tags}
                         status={status}
+                        img={task.attachments?.[0]?.download_url}
+                        onClick={() => handleTaskCardClick(task)}
                     />
                 ))}
 
                 {status === "Backlog" && (
-                    <AddTaskButton onClick={toggleModal} />
+                    <AddTaskButton onClick={handleAddTaskClick} />
                 )}
             </div>
 
-            {status === "Backlog" && (
-                <Modal
-                    title="Task details"
-                    isOpen={isModalOpen}
-                    onClose={toggleModal}
-                    isRequestLoading={formMethods.isCreatingTask}
-                    onConfirm={onModalConfirmSubmit}
-                    cancelButtonText="Cancel"
-                    submitButtonText="Save"
-                    submitButtonProps={{
-                        "data-testid": "create-task-submit",
-                    }}
-                >
-                    <FormProvider {...formMethods}>
-                        <TaskForm />
-                    </FormProvider>
-                </Modal>
-            )}
+            <Modal
+                title={editingTask ? "Edit Task" : "Task details"}
+                isOpen={isModalOpen}
+                onClose={toggleModal}
+                isRequestLoading={isCreatingTask}
+                onConfirm={onModalConfirmSubmit}
+                cancelButtonText="Cancel"
+                submitButtonText={editingTask ? "Update" : "Save"}
+                submitButtonProps={{
+                    "data-testid": editingTask
+                        ? "update-task-submit"
+                        : "create-task-submit",
+                    disabled: editingTask && !hasChanges,
+                }}
+            >
+                <FormProvider {...formProviderMethods}>
+                    <TaskForm />
+                </FormProvider>
+            </Modal>
         </section>
     );
 };

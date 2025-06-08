@@ -25,7 +25,8 @@ const TaskForm: React.FC = () => {
         formState: { errors },
     } = useFormContext();
 
-    const image = watch("image") as File | null;
+    const image = watch("image") as File | string | null;
+    const removeExistingImage = watch("removeExistingImage");
 
     const tagOptions = useMemo(() => {
         if (!tagsData?.data) return [];
@@ -41,23 +42,38 @@ const TaskForm: React.FC = () => {
     const handleImageChange = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>) => {
             const file = e.target.files?.[0];
-            if (file) setValue("image", file);
+            if (file) {
+                setValue("image", file);
+                setValue("removeExistingImage", false); // Reset remove flag quando si seleziona una nuova immagine
+            }
         },
         [setValue]
     );
 
     const handleRemoveImage = useCallback(() => {
+        const currentImage = watch("image");
+
+        if (typeof currentImage === "string") {
+            setValue("removeExistingImage", true);
+        }
+
         setValue("image", null);
-    }, [setValue]);
+    }, [setValue, watch]);
+
+    const shouldShowImage = image && !removeExistingImage;
 
     return (
         <div className="space-y-6">
             <div className="space-y-2">
-                {image ? (
+                {shouldShowImage ? (
                     <div className="relative">
                         <img
                             data-testid="image-preview"
-                            src={URL.createObjectURL(image)}
+                            src={
+                                typeof image === "string"
+                                    ? image
+                                    : URL.createObjectURL(image as File)
+                            }
                             alt="Preview"
                             className="w-full h-24 object-cover rounded-md"
                         />

@@ -104,6 +104,42 @@ export const apiSlice = createApi({
                 { type: "Task", id: "LIST", parentId: projectId },
             ],
         }),
+        addTagToTask: builder.mutation<
+            void,
+            { taskId: string; tagId: string; projectId: string }
+        >({
+            query: ({ taskId, tagId }) => ({
+                url: `/tasks/${taskId}/addTag`,
+                method: "POST",
+                body: {
+                    data: {
+                        tag: tagId,
+                    },
+                },
+            }),
+            invalidatesTags: (_, __, { taskId, projectId }) => [
+                { type: "Task", id: taskId },
+                { type: "Task", id: "LIST", parentId: projectId },
+            ],
+        }),
+        removeTagFromTask: builder.mutation<
+            void,
+            { taskId: string; tagId: string; projectId: string }
+        >({
+            query: ({ taskId, tagId }) => ({
+                url: `/tasks/${taskId}/removeTag`,
+                method: "POST",
+                body: {
+                    data: {
+                        tag: tagId,
+                    },
+                },
+            }),
+            invalidatesTags: (_, __, { taskId, projectId }) => [
+                { type: "Task", id: taskId },
+                { type: "Task", id: "LIST", parentId: projectId },
+            ],
+        }),
         getTags: builder.query<
             { data: Array<{ gid: string; name: string }> },
             string
@@ -248,6 +284,7 @@ export const apiSlice = createApi({
         }),
     }),
 });
+
 export const {
     useGetTasksQuery,
     useGetProjectsQuery,
@@ -258,6 +295,8 @@ export const {
     useUpdateTaskMutation,
     useDeleteTaskMutation,
     useMoveTaskToSectionMutation,
+    useAddTagToTaskMutation,
+    useRemoveTagFromTaskMutation,
     useCreateProjectMutation,
     useCreateSectionInProjectMutation,
     useDeleteProjectMutation,
