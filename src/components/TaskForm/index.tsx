@@ -63,7 +63,7 @@ const TaskForm: React.FC = () => {
     const shouldShowImage = image && !removeExistingImage;
 
     return (
-        <div className="space-y-6">
+        <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
             <div className="space-y-2">
                 {shouldShowImage ? (
                     <div className="relative">
@@ -222,7 +222,7 @@ const TaskForm: React.FC = () => {
                     </p>
                 )}
             </div>
-        </div>
+        </form>
     );
 };
 

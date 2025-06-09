@@ -88,9 +88,6 @@ export const apiSlice = createApi({
                     },
                 },
             }),
-            invalidatesTags: (_, __, { projectId }) => [
-                { type: "Task", id: "LIST", parentId: projectId },
-            ],
         }),
         deleteTask: builder.mutation<
             void,

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo } from "react";
 import Lottie from "lottie-react";
 import { monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import emptyState from "../../assets/lottie/emptyState.json";
@@ -27,8 +27,6 @@ const Board: React.FC<BoardProps> = ({ selectedId }) => {
     const [moveTaskToSection] = useMoveTaskToSectionMutation();
     const dispatch = useDispatch<AppDispatch>();
 
-    const [isDragUpdateInProgress, setIsDragUpdateInProgress] = useState(false);
-
     useEffect(() => {
         return monitorForElements({
             onDrop({ source, location }) {
@@ -41,8 +39,6 @@ const Board: React.FC<BoardProps> = ({ selectedId }) => {
                 const sectionId = destination.data.sectionId as string;
 
                 if (startStatus === newStatus || !sectionId) return;
-
-                setIsDragUpdateInProgress(true);
 
                 const patchResult = dispatch(
                     apiSlice.util.updateQueryData(
@@ -72,18 +68,12 @@ const Board: React.FC<BoardProps> = ({ selectedId }) => {
         });
     }, [dispatch, selectedId, tasks, moveTaskToSection]);
 
-    useEffect(() => {
-        if (!isFetching) {
-            setIsDragUpdateInProgress(false);
-        }
-    }, [isFetching]);
-
     const showEmptyState = useMemo(() => !selectedId, [selectedId]);
     const showError = useMemo(() => selectedId && error, [error, selectedId]);
 
     const showSkeletons = useMemo(
-        () => isLoading || (isFetching && !isDragUpdateInProgress),
-        [isLoading, isFetching, isDragUpdateInProgress]
+        () => isLoading || isFetching,
+        [isLoading, isFetching]
     );
 
     const showColumns = useMemo(
@@ -132,7 +122,7 @@ const Board: React.FC<BoardProps> = ({ selectedId }) => {
                         skeletonCount.map((count, i) => (
                             <Skeleton key={i} count={count} />
                         ))}
-                    {(!isFetching || isDragUpdateInProgress) &&
+                    {!isFetching &&
                         showColumns &&
                         statuses.map((status) => (
                             <Column
