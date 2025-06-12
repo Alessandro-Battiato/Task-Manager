@@ -507,7 +507,9 @@ describe("Task Hive Application", () => {
                         cy.get('[data-testid="create-task-btn"]').click();
                     });
 
-                    cy.get('[data-testid="create-task-submit"]').click();
+                    cy.get('[data-testid="create-task-submit"]')
+                        .first()
+                        .click();
                     cy.get('[data-testid="task-name-input-error"]').should(
                         "be.visible"
                     );
@@ -521,17 +523,19 @@ describe("Task Hive Application", () => {
 
                     cy.fixture("test-image.jpg", "base64").then(
                         (fileContent) => {
-                            cy.get('[data-testid="image-upload"]').selectFile(
-                                {
-                                    contents: Cypress.Buffer.from(
-                                        fileContent,
-                                        "base64"
-                                    ),
-                                    fileName: "test-image.jpg",
-                                    mimeType: "image/jpeg",
-                                },
-                                { force: true }
-                            );
+                            cy.get('[data-testid="image-upload"]')
+                                .first()
+                                .selectFile(
+                                    {
+                                        contents: Cypress.Buffer.from(
+                                            fileContent,
+                                            "base64"
+                                        ),
+                                        fileName: "test-image.jpg",
+                                        mimeType: "image/jpeg",
+                                    },
+                                    { force: true }
+                                );
                         }
                     );
 
