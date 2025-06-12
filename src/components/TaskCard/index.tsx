@@ -54,7 +54,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
             <div className="card-body gap-3 p-4">
                 {!!img && (
                     <img
-                        className="object-cover w-full max-h-32 rounded-2xl"
+                        draggable="false"
+                        className="object-cover w-full max-h-32 rounded-2xl pointer-events-none"
                         src={img}
                         alt="Card image"
                     />

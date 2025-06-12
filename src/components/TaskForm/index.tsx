@@ -44,7 +44,7 @@ const TaskForm: React.FC = () => {
             const file = e.target.files?.[0];
             if (file) {
                 setValue("image", file);
-                setValue("removeExistingImage", false); // Reset remove flag quando si seleziona una nuova immagine
+                setValue("removeExistingImage", false);
             }
         },
         [setValue]
@@ -60,7 +60,10 @@ const TaskForm: React.FC = () => {
         setValue("image", null);
     }, [setValue, watch]);
 
-    const shouldShowImage = image && !removeExistingImage;
+    const shouldShowImage = useMemo(
+        () => image && !removeExistingImage,
+        [image, removeExistingImage]
+    );
 
     return (
         <form onSubmit={(e) => e.preventDefault()} className="space-y-6">

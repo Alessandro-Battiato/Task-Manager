@@ -11,6 +11,7 @@ export type Task = {
         name: string;
     }>;
     attachments?: Array<{
+        gid: string;
         download_url: string;
     }>;
 };

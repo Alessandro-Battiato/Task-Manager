@@ -32,10 +32,7 @@ const Column: React.FC<ColumnProps> = ({ status, selectedId }) => {
 
     const toggleModal = useCallback(() => {
         setIsModalOpen((prev) => !prev);
-        if (isModalOpen) {
-            setEditingTask(undefined);
-        }
-    }, [isModalOpen]);
+    }, []);
 
     const sectionId = useSelector(selectSectionIdByStatus(selectedId, status));
     const tasks = useSelector(selectTasksByProjectId(selectedId));
@@ -81,7 +78,10 @@ const Column: React.FC<ColumnProps> = ({ status, selectedId }) => {
         isEditing: !!editingTask,
         taskId: editingTask?.gid,
         currentStatus: editingTask?.memberships[0].section.name,
+        currentAttachmentId: editingTask?.attachments?.[0]?.gid,
     });
+
+    const watchedValues = watch();
 
     const handleTaskCardClick = useCallback((task: Task) => {
         setEditingTask(task);
@@ -96,7 +96,7 @@ const Column: React.FC<ColumnProps> = ({ status, selectedId }) => {
     const hasChanges = useMemo(() => {
         if (!editingTask) return true;
 
-        const currentValues = getValues();
+        const currentValues = watchedValues;
 
         const nameChanged = currentValues.taskName !== initialValues.taskName;
         const statusChanged = currentValues.status !== initialValues.status;
@@ -114,20 +114,26 @@ const Column: React.FC<ColumnProps> = ({ status, selectedId }) => {
             imageChanged ||
             imageRemoved
         );
-    }, [editingTask, initialValues, getValues]);
+    }, [
+        editingTask,
+        initialValues.image,
+        initialValues.status,
+        initialValues.tags,
+        initialValues.taskName,
+        watchedValues,
+    ]);
 
     const onModalConfirmSubmit = useCallback(() => {
         if (editingTask) {
-            handleUpdateTaskSubmit(getValues());
+            handleSubmit(handleUpdateTaskSubmit)();
         } else {
             handleSubmit(handleCreateTaskSubmit)();
         }
     }, [
         editingTask,
-        handleUpdateTaskSubmit,
         handleSubmit,
+        handleUpdateTaskSubmit,
         handleCreateTaskSubmit,
-        getValues,
     ]);
 
     const ref = useRef<HTMLElement>(null);
@@ -199,7 +205,9 @@ const Column: React.FC<ColumnProps> = ({ status, selectedId }) => {
                 title={editingTask ? "Edit Task" : "Task details"}
                 isOpen={isModalOpen}
                 onClose={toggleModal}
-                isRequestLoading={isCreatingTask}
+                isRequestLoading={
+                    isCreatingTask || (!!editingTask && !hasChanges)
+                }
                 onConfirm={onModalConfirmSubmit}
                 cancelButtonText="Cancel"
                 submitButtonText={editingTask ? "Update" : "Save"}
@@ -207,7 +215,6 @@ const Column: React.FC<ColumnProps> = ({ status, selectedId }) => {
                     "data-testid": editingTask
                         ? "update-task-submit"
                         : "create-task-submit",
-                    disabled: editingTask && !hasChanges,
                 }}
             >
                 <FormProvider {...formProviderMethods}>

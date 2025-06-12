@@ -20,7 +20,7 @@ export const apiSlice = createApi({
                 url: `/projects/${projectId}/tasks`,
                 params: {
                     opt_fields:
-                        "name,memberships.section.name,tags.name,attachments.download_url",
+                        "name,memberships.section.name,tags.name,attachments.download_url,attachments.gid",
                 },
             }),
             providesTags: (result, _, projectId) =>
@@ -55,9 +55,6 @@ export const apiSlice = createApi({
                     },
                 },
             }),
-            invalidatesTags: (_, __, { projectId }) => [
-                { type: "Task", id: "LIST", parentId: projectId },
-            ],
         }),
         updateTask: builder.mutation<
             Task,
@@ -70,10 +67,6 @@ export const apiSlice = createApi({
                     data: taskData,
                 },
             }),
-            invalidatesTags: (_, __, { taskId, projectId }) => [
-                { type: "Task", id: taskId },
-                { type: "Task", id: "LIST", parentId: projectId },
-            ],
         }),
         moveTaskToSection: builder.mutation<
             void,
@@ -188,7 +181,7 @@ export const apiSlice = createApi({
         }),
         uploadAttachment: builder.mutation<
             { data: { gid: string; download_url: string } },
-            { file: File; parent: string }
+            { file: File; parent: string; projectId?: string }
         >({
             query: ({ file, parent }) => {
                 const formData = new FormData();
@@ -207,6 +200,15 @@ export const apiSlice = createApi({
                     },
                 };
             },
+        }),
+        removeAttachment: builder.mutation<
+            void,
+            { attachmentId: string; projectId: string }
+        >({
+            query: ({ attachmentId }) => ({
+                url: `/attachments/${attachmentId}`,
+                method: "DELETE",
+            }),
         }),
         getProjects: builder.query<{ data: Project[] }, string>({
             query: (workspaceId) => ({
@@ -288,6 +290,7 @@ export const {
     useGetTagsQuery,
     useGetProjectSectionsQuery,
     useUploadAttachmentMutation,
+    useRemoveAttachmentMutation,
     useCreateTaskMutation,
     useUpdateTaskMutation,
     useDeleteTaskMutation,

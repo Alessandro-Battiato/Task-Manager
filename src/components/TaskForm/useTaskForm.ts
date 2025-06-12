@@ -6,11 +6,14 @@ import {
     useUpdateTaskMutation,
     useMoveTaskToSectionMutation,
     useUploadAttachmentMutation,
+    useRemoveAttachmentMutation,
     useGetProjectSectionsQuery,
     useAddTagToTaskMutation,
     useRemoveTagFromTaskMutation,
+    apiSlice,
 } from "../../features/api/apiSlice";
 import * as yup from "yup";
+import { useDispatch } from "react-redux";
 
 const taskSchema = yup.object({
     taskName: yup
@@ -26,10 +29,18 @@ const taskSchema = yup.object({
         .mixed()
         .nullable()
         .notRequired()
-        .test("is-file", (value) => !value || value instanceof File)
+        .test(
+            "is-valid-image",
+            "Image must be a valid file or a string URL",
+            (value) => {
+                return (
+                    !value || typeof value === "string" || value instanceof File
+                );
+            }
+        )
         .test(
             "fileSize",
-            "The file is too large",
+            "The file is too large (max 5MB)",
             (file) =>
                 !file || !(file instanceof File) || file.size <= 5 * 1024 * 1024
         ),
@@ -45,6 +56,7 @@ interface UseTaskFormProps {
     isEditing?: boolean;
     taskId?: string;
     currentStatus?: string;
+    currentAttachmentId?: string;
 }
 
 export const useTaskForm = ({
@@ -54,13 +66,18 @@ export const useTaskForm = ({
     isEditing = false,
     taskId,
     currentStatus,
+    currentAttachmentId,
 }: UseTaskFormProps) => {
+    const dispatch = useDispatch();
+
     const [createTask, { isLoading: isCreatingTask }] = useCreateTaskMutation();
     const [updateTask, { isLoading: isUpdatingTask }] = useUpdateTaskMutation();
     const [moveTaskToSection, { isLoading: isMovingTask }] =
         useMoveTaskToSectionMutation();
     const [uploadAttachment, { isLoading: isUploadingAttachment }] =
         useUploadAttachmentMutation();
+    const [removeAttachment, { isLoading: isRemovingAttachment }] =
+        useRemoveAttachmentMutation();
     const [addTagToTask, { isLoading: isAddingTag }] =
         useAddTagToTaskMutation();
     const [removeTagFromTask, { isLoading: isRemovingTag }] =
@@ -75,36 +92,83 @@ export const useTaskForm = ({
             const currentTagsSet = new Set(currentTags);
 
             const tagsToAdd = newTags.filter((tag) => !currentTagsSet.has(tag));
-
             const tagsToRemove = currentTags.filter(
                 (tag) => !newTagsSet.has(tag)
             );
 
-            for (const tagId of tagsToAdd) {
-                try {
-                    await addTagToTask({
+            const tagOperations = [
+                ...tagsToAdd.map((tagId) =>
+                    addTagToTask({
                         taskId,
                         tagId,
                         projectId,
-                    }).unwrap();
-                } catch (error) {
-                    console.error(`Failed to add tag ${tagId}:`, error);
-                }
-            }
+                    })
+                        .unwrap()
+                        .catch((error) => {
+                            console.error(`Failed to add tag ${tagId}:`, error);
+                            throw error;
+                        })
+                ),
+                ...tagsToRemove.map((tagId) =>
+                    removeTagFromTask({
+                        taskId,
+                        tagId,
+                        projectId,
+                    })
+                        .unwrap()
+                        .catch((error) => {
+                            console.error(
+                                `Failed to remove tag ${tagId}:`,
+                                error
+                            );
+                            throw error;
+                        })
+                ),
+            ];
 
-            for (const tagId of tagsToRemove) {
-                try {
-                    await removeTagFromTask({
-                        taskId,
-                        tagId,
-                        projectId,
-                    }).unwrap();
-                } catch (error) {
-                    console.error(`Failed to remove tag ${tagId}:`, error);
-                }
+            if (tagOperations.length > 0) {
+                await Promise.all(tagOperations);
             }
         },
         [addTagToTask, initialValues?.tags, removeTagFromTask]
+    );
+
+    const handleImageUpdate = useCallback(
+        async (formData: TaskFormValues, taskId: string, projectId: string) => {
+            const hasNewImage = formData.image instanceof File;
+            const shouldRemoveExisting = formData.removeExistingImage;
+            const hasExistingImage = !!currentAttachmentId;
+
+            if (hasNewImage) {
+                if (hasExistingImage) {
+                    await removeAttachment({
+                        attachmentId: currentAttachmentId,
+                        projectId,
+                    }).unwrap();
+                }
+
+                if (!(formData.image instanceof File)) {
+                    console.error("Error: Invalid file format");
+                    return;
+                }
+
+                await uploadAttachment({
+                    file: formData.image,
+                    parent: taskId,
+                    projectId,
+                }).unwrap();
+                return;
+            }
+
+            if (!hasNewImage && hasExistingImage && shouldRemoveExisting) {
+                await removeAttachment({
+                    attachmentId: currentAttachmentId,
+                    projectId,
+                }).unwrap();
+                return;
+            }
+        },
+        [currentAttachmentId, removeAttachment, uploadAttachment]
     );
 
     const { data: sectionsData, isLoading: sectionsLoading } =
@@ -163,13 +227,16 @@ export const useTaskForm = ({
                     taskData: taskApiPayload,
                 }).unwrap();
 
-                if (
-                    formData.image instanceof File &&
-                    createdTaskResponse.data.gid
-                ) {
+                if (!(formData.image instanceof File)) {
+                    console.error("Error: Invalid file format");
+                    return;
+                }
+
+                if (createdTaskResponse.data.gid) {
                     await uploadAttachment({
                         file: formData.image,
                         parent: createdTaskResponse.data.gid,
+                        projectId,
                     }).unwrap();
                 }
 
@@ -184,6 +251,10 @@ export const useTaskForm = ({
                 onSuccess?.();
             } catch (err) {
                 console.error("Task creation failed:", err);
+            } finally {
+                dispatch(
+                    apiSlice.util.invalidateTags([{ type: "Task", id: "LIST" }])
+                );
             }
         },
         [
@@ -193,6 +264,7 @@ export const useTaskForm = ({
             formMethods,
             sectionsData,
             onSuccess,
+            dispatch,
         ]
     );
 
@@ -204,45 +276,51 @@ export const useTaskForm = ({
             }
 
             try {
-                const taskUpdateData = {
-                    name: formData.taskName,
-                };
+                const updatePromises = [];
 
-                await updateTask({
-                    taskId,
-                    taskData: taskUpdateData,
-                    projectId,
-                }).unwrap();
+                updatePromises.push(
+                    updateTask({
+                        taskId,
+                        taskData: { name: formData.taskName },
+                        projectId,
+                    }).unwrap()
+                );
 
                 if (currentStatus && formData.status !== currentStatus) {
                     const targetSection = sectionsData.data.find(
                         (section) => section.name === formData.status
                     );
-
                     if (targetSection) {
-                        await moveTaskToSection({
-                            sectionId: targetSection.gid,
-                            taskId,
-                            projectId,
-                        }).unwrap();
+                        updatePromises.push(
+                            moveTaskToSection({
+                                sectionId: targetSection.gid,
+                                taskId,
+                                projectId,
+                            }).unwrap()
+                        );
                     }
                 }
 
                 if (formData.tags) {
-                    await handleTagsUpdate(formData.tags, taskId, projectId);
+                    updatePromises.push(
+                        handleTagsUpdate(formData.tags, taskId, projectId)
+                    );
                 }
 
-                if (formData.image && formData.image instanceof File) {
-                    await uploadAttachment({
-                        file: formData.image,
-                        parent: taskId,
-                    }).unwrap();
-                }
+                updatePromises.push(
+                    handleImageUpdate(formData, taskId, projectId)
+                );
+
+                await Promise.all(updatePromises);
 
                 onSuccess?.();
             } catch (err) {
                 console.error("Task update failed:", err);
                 throw err;
+            } finally {
+                dispatch(
+                    apiSlice.util.invalidateTags([{ type: "Task", id: "LIST" }])
+                );
             }
         },
         [
@@ -251,10 +329,11 @@ export const useTaskForm = ({
             updateTask,
             projectId,
             currentStatus,
-            handleTagsUpdate,
             onSuccess,
             moveTaskToSection,
-            uploadAttachment,
+            handleTagsUpdate,
+            handleImageUpdate,
+            dispatch,
         ]
     );
 
@@ -275,6 +354,7 @@ export const useTaskForm = ({
             isUpdatingTask ||
             isMovingTask ||
             isUploadingAttachment ||
+            isRemovingAttachment ||
             isAddingTag ||
             isRemovingTag ||
             sectionsLoading,
