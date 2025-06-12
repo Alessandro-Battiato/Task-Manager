@@ -227,12 +227,10 @@ export const useTaskForm = ({
                     taskData: taskApiPayload,
                 }).unwrap();
 
-                if (!(formData.image instanceof File)) {
-                    console.error("Error: Invalid file format");
-                    return;
-                }
-
-                if (createdTaskResponse.data.gid) {
+                if (
+                    formData.image instanceof File &&
+                    createdTaskResponse.data.gid
+                ) {
                     await uploadAttachment({
                         file: formData.image,
                         parent: createdTaskResponse.data.gid,

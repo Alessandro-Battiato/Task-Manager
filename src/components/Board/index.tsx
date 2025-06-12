@@ -116,7 +116,7 @@ const Board: React.FC<BoardProps> = ({ selectedId }) => {
                 </div>
             )}
 
-            {(showSkeletons || showColumns) && (
+            {!showEmptyState && (showSkeletons || showColumns) && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 h-full">
                     {showSkeletons &&
                         skeletonCount.map((count, i) => (

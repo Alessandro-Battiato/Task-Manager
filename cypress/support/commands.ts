@@ -43,3 +43,46 @@ Cypress.Commands.add("selectProject", (projectId) => {
 Cypress.Commands.add("openMobileSidebar", () => {
     cy.get('[data-testid="mobile-menu-button"]').click();
 });
+
+Cypress.Commands.add("visitWithProjects", () => {
+    cy.intercept(
+        {
+            method: "GET",
+            url: "https://app.asana.com/api/1.0/projects*", // wildcard to handle opt_fields, workspace, ecc.
+        },
+        {
+            statusCode: 200,
+            fixture: "projects.json",
+        }
+    ).as("getProjects");
+
+    cy.visit("/");
+
+    cy.wait("@getProjects");
+});
+
+Cypress.Commands.add("setupProjectsAndTasks", () => {
+    cy.visitWithProjects();
+
+    cy.intercept(
+        {
+            method: "GET",
+            url: "https://app.asana.com/api/1.0/projects/p1/tasks*",
+        },
+        {
+            statusCode: 200,
+            fixture: "tasks.json",
+        }
+    ).as("getTasksP1");
+
+    cy.intercept(
+        {
+            method: "GET",
+            url: "https://app.asana.com/api/1.0/projects/p2/tasks*",
+        },
+        {
+            statusCode: 200,
+            fixture: "tasks.json",
+        }
+    ).as("getTasksP2");
+});

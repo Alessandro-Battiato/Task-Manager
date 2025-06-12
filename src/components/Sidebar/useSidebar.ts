@@ -46,7 +46,10 @@ export const useSidebar = (handleSelectId: (id: string) => void) => {
     const handleDeleteProject = useCallback(
         async (id: string) => {
             try {
-                await deleteProject(id).unwrap();
+                await deleteProject({
+                    projectId: id,
+                    workspaceId: WORKSPACE_ID,
+                }).unwrap();
 
                 handleSelectId("");
 
