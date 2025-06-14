@@ -15,9 +15,11 @@ const DeleteButton: React.FC<DeleteButtonProps> = ({
 }) => {
     const handleClick = useCallback(
         (e: React.MouseEvent) => {
-            e.stopPropagation();
-            e.preventDefault();
-            onClick();
+            if (onClick) {
+                e.stopPropagation();
+                e.preventDefault();
+                onClick();
+            }
         },
         [onClick]
     );

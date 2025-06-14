@@ -100,6 +100,12 @@ const Column: React.FC<ColumnProps> = ({ status, selectedId }) => {
         setIsModalOpen(true);
     }, []);
 
+    const handleCloseDeleteModal = useCallback(() => {
+        setTimeout(() => {
+            setTaskToDelete(undefined);
+        }, 300);
+    }, []);
+
     const hasChanges = useMemo(() => {
         if (!editingTask) return true;
 
@@ -232,7 +238,7 @@ const Column: React.FC<ColumnProps> = ({ status, selectedId }) => {
 
             <Modal
                 isOpen={!!taskToDelete}
-                onClose={() => setTaskToDelete(undefined)}
+                onClose={handleCloseDeleteModal}
                 onConfirm={() => taskToDelete && handleDeleteTask(taskToDelete)}
                 isRequestLoading={isDeletingTask}
                 title="Confirm Delete"
