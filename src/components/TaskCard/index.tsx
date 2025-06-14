@@ -17,6 +17,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
     tags,
     status,
     onClick,
+    onDelete,
 }) => {
     const [isDragging, setIsDragging] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
@@ -80,7 +81,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
                 </div>
                 <div className="absolute top-2 right-2">
                     <DeleteButton
-                        // onClick={() => onDelete?.(taskId)}
+                        onClick={onDelete}
                         data-testid={`delete-task-${taskId}`}
                         size="lg"
                     />

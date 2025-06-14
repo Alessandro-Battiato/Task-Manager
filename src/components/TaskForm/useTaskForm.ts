@@ -11,9 +11,11 @@ import {
     useAddTagToTaskMutation,
     useRemoveTagFromTaskMutation,
     apiSlice,
+    useDeleteTaskMutation,
 } from "../../features/api/apiSlice";
 import * as yup from "yup";
 import { useDispatch } from "react-redux";
+import type { Task } from "../../types/task";
 
 const taskSchema = yup.object({
     taskName: yup
@@ -52,6 +54,7 @@ type TaskFormValues = yup.InferType<typeof taskSchema>;
 interface UseTaskFormProps {
     projectId: string;
     onSuccess?: () => void;
+    onDeleteSuccess?: () => void;
     initialValues?: Partial<TaskFormValues>;
     isEditing?: boolean;
     taskId?: string;
@@ -62,6 +65,7 @@ interface UseTaskFormProps {
 export const useTaskForm = ({
     projectId,
     onSuccess,
+    onDeleteSuccess,
     initialValues,
     isEditing = false,
     taskId,
@@ -72,6 +76,7 @@ export const useTaskForm = ({
 
     const [createTask, { isLoading: isCreatingTask }] = useCreateTaskMutation();
     const [updateTask, { isLoading: isUpdatingTask }] = useUpdateTaskMutation();
+    const [deleteTask, { isLoading: isDeletingTask }] = useDeleteTaskMutation();
     const [moveTaskToSection, { isLoading: isMovingTask }] =
         useMoveTaskToSectionMutation();
     const [uploadAttachment, { isLoading: isUploadingAttachment }] =
@@ -82,6 +87,30 @@ export const useTaskForm = ({
         useAddTagToTaskMutation();
     const [removeTagFromTask, { isLoading: isRemovingTag }] =
         useRemoveTagFromTaskMutation();
+
+    const handleDeleteTask = useCallback(
+        async (task: Task) => {
+            const targetTaskId = task?.gid || "";
+            if (!targetTaskId) {
+                console.error("Task ID is required for deletion");
+                return false;
+            }
+
+            try {
+                await deleteTask({
+                    taskId: targetTaskId,
+                    projectId,
+                }).unwrap();
+
+                onDeleteSuccess?.();
+                return true;
+            } catch (err) {
+                console.error("Task deletion failed:", err);
+                return false;
+            }
+        },
+        [deleteTask, projectId, onDeleteSuccess]
+    );
 
     const handleTagsUpdate = useCallback(
         async (newTags: string[], taskId: string, projectId: string) => {
@@ -346,6 +375,7 @@ export const useTaskForm = ({
         ...formMethods,
         handleCreateTaskSubmit,
         handleUpdateTaskSubmit,
+        handleDeleteTask,
         handleSubmit,
         isCreatingTask:
             isCreatingTask ||
@@ -357,5 +387,6 @@ export const useTaskForm = ({
             isRemovingTag ||
             sectionsLoading,
         isEditing,
+        isDeletingTask,
     };
 };

@@ -13,6 +13,7 @@ export interface TaskCardProps {
     }>;
     status: string;
     onClick?: () => void;
+    onDelete?: () => void;
     attachments?: Array<{
         gid: string;
         download_url: string;

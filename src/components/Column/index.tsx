@@ -29,6 +29,7 @@ const Column: React.FC<ColumnProps> = ({ status, selectedId }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDraggedOver, setIsDraggedOver] = useState(false);
     const [editingTask, setEditingTask] = useState<Task>();
+    const [taskToDelete, setTaskToDelete] = useState<Task>();
 
     const toggleModal = useCallback(() => {
         setIsModalOpen((prev) => !prev);
@@ -67,7 +68,9 @@ const Column: React.FC<ColumnProps> = ({ status, selectedId }) => {
         handleSubmit,
         handleCreateTaskSubmit,
         handleUpdateTaskSubmit,
+        handleDeleteTask,
         isCreatingTask,
+        isDeletingTask,
         reset,
         watch,
         ...restFormMethods
@@ -86,6 +89,10 @@ const Column: React.FC<ColumnProps> = ({ status, selectedId }) => {
     const handleTaskCardClick = useCallback((task: Task) => {
         setEditingTask(task);
         setIsModalOpen(true);
+    }, []);
+
+    const handleDeleteTaskCard = useCallback((task: Task) => {
+        setTaskToDelete(task);
     }, []);
 
     const handleAddTaskClick = useCallback(() => {
@@ -193,6 +200,7 @@ const Column: React.FC<ColumnProps> = ({ status, selectedId }) => {
                         status={status}
                         img={task.attachments?.[0]?.download_url}
                         onClick={() => handleTaskCardClick(task)}
+                        onDelete={() => handleDeleteTaskCard(task)}
                     />
                 ))}
 
@@ -220,6 +228,27 @@ const Column: React.FC<ColumnProps> = ({ status, selectedId }) => {
                 <FormProvider {...formProviderMethods}>
                     <TaskForm />
                 </FormProvider>
+            </Modal>
+
+            <Modal
+                isOpen={!!taskToDelete}
+                onClose={() => setTaskToDelete(undefined)}
+                onConfirm={() => taskToDelete && handleDeleteTask(taskToDelete)}
+                isRequestLoading={isDeletingTask}
+                title="Confirm Delete"
+                submitButtonText="Confirm"
+                submitButtonProps={{
+                    "data-testid": "confirm-delete-btn",
+                }}
+                cancelButtonText="Cancel"
+                cancelButtonProps={{
+                    "data-testid": "cancel-delete-btn",
+                }}
+            >
+                <p>
+                    Are you sure you want to delete the task "
+                    {taskToDelete?.name}"?
+                </p>
             </Modal>
         </section>
     );
