@@ -1,0 +1,40 @@
+{
+    "data": [
+        {
+            "gid": "t1",
+            "name": "Design new landing page",
+            "memberships": [
+                {
+                    "section": {
+                        "name": "Backlog"
+                    }
+                }
+            ],
+            "tags": [
+                {
+                    "gid": "t1",
+                    "name": "design"
+                },
+                {
+                    "gid": "t2",
+                    "name": "urgent"
+                },
+                {
+                    "gid": "t3",
+                    "name": "concept"
+                },
+                {
+                    "gid": "t4",
+                    "name": "test"
+                }
+            ],
+            "attachments": [
+                {
+                    "gid": "att1",
+                    "name": "test-image.jpg",
+                    "download_url": "cypress/fixtures/test-image.jpg"
+                }
+            ]
+        }
+    ]
+}

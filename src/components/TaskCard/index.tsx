@@ -47,6 +47,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
         <div
             ref={ref}
             onClick={handleClick}
+            data-testid={`task-card-${taskId}`}
             className={`card rounded-2xl shadow bg-base-100 cursor-pointer transition-transform hover:scale-85 ${
                 isDragging ? "opacity-50 rotate-2 scale-90" : ""
             }`}

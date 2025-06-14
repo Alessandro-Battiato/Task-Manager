@@ -61,7 +61,9 @@ Cypress.Commands.add("visitWithProjects", () => {
     cy.wait("@getProjects");
 });
 
-Cypress.Commands.add("setupProjectsAndTasks", () => {
+Cypress.Commands.add("setupProjectsAndTasks", (options = {}) => {
+    const { tasksFixture = "tasks.json" } = options;
+
     cy.visitWithProjects();
 
     cy.intercept(
@@ -71,7 +73,7 @@ Cypress.Commands.add("setupProjectsAndTasks", () => {
         },
         {
             statusCode: 200,
-            fixture: "tasks.json",
+            fixture: tasksFixture,
         }
     ).as("getTasksP1");
 
@@ -82,7 +84,7 @@ Cypress.Commands.add("setupProjectsAndTasks", () => {
         },
         {
             statusCode: 200,
-            fixture: "tasks.json",
+            fixture: tasksFixture,
         }
     ).as("getTasksP2");
 });
