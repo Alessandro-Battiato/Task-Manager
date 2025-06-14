@@ -11,10 +11,11 @@
         "declarationMap": true,
 
         /* Bundler mode */
+        "allowImportingTsExtensions": true,
         "moduleResolution": "bundler",
         "verbatimModuleSyntax": true,
         "moduleDetection": "force",
-        "noEmit": false,
+        "emitDeclarationOnly": true,
         "jsx": "react-jsx",
 
         /* Linting */

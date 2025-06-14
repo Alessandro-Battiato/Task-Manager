@@ -2,7 +2,7 @@
     "files": [],
     "compilerOptions": {
         "module": "ESNext",
-        "types": ["cypress", "node", "cypress-plugin-tab/src"] // Temp workaround https://github.com/kuceb/cypress-plugin-tab/issues/19#issuecomment-656615921
+        "types": ["cypress", "node"]
     },
     "include": ["cypress", "src"],
     "references": [
