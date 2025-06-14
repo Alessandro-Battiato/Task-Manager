@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { draggable } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import type { TaskCardProps } from "./types";
 import { tagStyles } from "../../types/tagStyles";
+import DeleteButton from "../DeleteButton";
 
 const style = (tag: string): { text: string; bg: string } =>
     tagStyles[tag] || {
@@ -52,7 +53,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
                 isDragging ? "opacity-50 rotate-2 scale-90" : ""
             }`}
         >
-            <div className="card-body gap-3 p-4">
+            <div className="card-body relative group gap-3 p-4">
                 {!!img && (
                     <img
                         draggable="false"
@@ -76,6 +77,13 @@ const TaskCard: React.FC<TaskCardProps> = ({
                             </span>
                         );
                     })}
+                </div>
+                <div className="absolute top-2 right-2">
+                    <DeleteButton
+                        // onClick={() => onDelete?.(taskId)}
+                        data-testid={`delete-task-${taskId}`}
+                        size="lg"
+                    />
                 </div>
             </div>
         </div>

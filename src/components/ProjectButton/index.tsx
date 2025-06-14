@@ -40,7 +40,7 @@ const ProjectButton: React.FC<ProjectButtonProps> = ({
                         onDeleteClick();
                     }}
                     className="ml-2 text-error cursor-pointer p-1 rounded-full hover:bg-error/10 transition-all items-center
-                    md:group-hover:opacity-100 md:opacity-0
+                    lg:group-hover:opacity-100 lg:opacity-0
                 "
                 >
                     <svg
